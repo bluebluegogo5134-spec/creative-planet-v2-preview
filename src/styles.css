@@ -43,8 +43,8 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .hero-copy span { color: var(--muted); font-size: 11px; letter-spacing: .18em; }
 .hero-copy h1 { margin: 12px 0 0; font-size: 20px; line-height: 1.62; letter-spacing: -.02em; text-shadow: 0 1px rgba(255,255,255,.88); }
 .page-hero { height: 150px; padding: max(28px, calc(env(safe-area-inset-top) + 15px)) 20px 16px; display: flex; flex-direction: column; justify-content: flex-end; border-radius: 0 0 26px 26px; background-position: center 44%; background-size: cover; }
-.page-hero p { margin-bottom: 4px; color: #607a9d; font-size: 11px; letter-spacing: .07em; }
-.page-hero h1 { margin: 0; font-size: 29px; }
+.page-hero p { margin-bottom: 4px; color: #496987; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-shadow: 0 1px 2px rgba(255, 255, 255, .95); }
+.page-hero h1 { margin: 0; font-size: 29px; text-shadow: 0 1px 2px rgba(255, 255, 255, .9); }
 
 .content-stack { display: grid; gap: 10px; padding: 11px 12px 24px; }
 .home-stack { margin-top: -10px; position: relative; z-index: 2; }
@@ -124,7 +124,10 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 
 .plan-item { display: grid; gap: 9px; }
 .plan-item small { color: var(--muted); font-size: 9px; }
-.plan-form-grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 6px; }
+.plan-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.plan-form-grid > label { min-width: 0; }
+.plan-form-grid > label:first-child { grid-column: 1 / -1; }
+.plan-form-grid input, .plan-form-grid select { min-width: 0; max-width: 100%; }
 .small-button { min-height: 38px; padding: 6px 11px; font-size: 11px; }
 .checkbox-line { display: flex; grid-template-columns: none; align-items: center; gap: 8px; color: var(--ink); }
 .checkbox-line input { width: 20px; min-height: 20px; margin: 0; }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { addDaysKey, getWeekStart, toDateKey } from './domain/date'
 import { CREATIVE_TYPES, type CreativeSession, type Project, type WeekPlanItem } from './domain/model'
 import { getElapsedMs } from './domain/timer'
@@ -34,6 +34,7 @@ function formatElapsed(ms: number): string {
 
 function App() {
   const [page, setPage] = useState<Page>('home')
+  const pageScrollRef = useRef<HTMLDivElement>(null)
   const ready = useAppStore((state) => state.ready)
   const error = useAppStore((state) => state.error)
   const activeTimer = useAppStore((state) => state.activeTimer)
@@ -42,6 +43,18 @@ function App() {
   useEffect(() => {
     void init()
   }, [init])
+
+  useEffect(() => {
+    pageScrollRef.current?.scrollTo({ top: 0, behavior: 'auto' })
+  }, [page])
+
+  const goToPage = (nextPage: Page) => {
+    if (nextPage === page) {
+      pageScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    setPage(nextPage)
+  }
 
   if (!ready) {
     return (
@@ -56,8 +69,8 @@ function App() {
   return (
     <main className="app-shell">
       {error && <div className="error-banner" role="alert">{error}</div>}
-      <div className="page-scroll">
-        {page === 'home' && <HomePage goTo={setPage} />}
+      <div ref={pageScrollRef} className="page-scroll">
+        {page === 'home' && <HomePage goTo={goToPage} />}
         {page === 'projects' && <ProjectsPage />}
         {page === 'session' && <SessionPage />}
         {page === 'plan' && <PlanPage />}
@@ -69,7 +82,7 @@ function App() {
             key={item.id}
             type="button"
             className={`nav-item ${page === item.id ? 'active' : ''} ${item.id === 'session' ? 'nav-create' : ''}`}
-            onClick={() => setPage(item.id)}
+            onClick={() => goToPage(item.id)}
             aria-current={page === item.id ? 'page' : undefined}
           >
             <span className="nav-icon">{item.id === 'session' && activeTimer.status !== 'idle' ? '●' : item.icon}</span>
@@ -505,7 +518,7 @@ function SessionLine({ session, projects }: { session: CreativeSession; projects
 function PageFrame({ eyebrow, title, image, children }: { eyebrow: string; title: string; image: string; children: ReactNode }) {
   return (
     <>
-      <header className="page-hero" style={{ backgroundImage: `linear-gradient(180deg, rgba(255,255,255,.08), rgba(237,245,251,.86)), url("./assets/${image}")` }}>
+      <header className="page-hero" style={{ backgroundImage: `linear-gradient(180deg, rgba(237,245,251,.38), rgba(237,245,251,.9)), url("./assets/${image}")` }}>
         <p>{eyebrow}</p><h1>{title}</h1>
       </header>
       <section className="content-stack">{children}</section>
