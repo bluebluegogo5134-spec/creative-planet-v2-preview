@@ -28,7 +28,7 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .preview-badge { position: absolute; z-index: 2; top: max(14px, calc(env(safe-area-inset-top) + 7px)); right: 14px; padding: 5px 8px; border: 1px solid rgba(255,255,255,.72); border-radius: 999px; color: #7a5b45; background: rgba(255,248,226,.58); backdrop-filter: blur(10px); font-size: 8px; letter-spacing: .06em; }
 .hero-copy { position: absolute; z-index: 2; left: 19px; bottom: 22px; width: 62%; }
 .hero-copy p { margin-bottom: 5px; color: #a16f4c; font-size: 8px; font-weight: 700; letter-spacing: .2em; }
-.hero-copy h1 { margin: 0; color: #644437; font-size: 28px; line-height: 1.2; letter-spacing: .04em; text-shadow: 0 1px 5px rgba(255,255,255,.92); }
+.hero-copy h1 { margin: 0; color: #644437; font-size: 20px; line-height: 1.5; letter-spacing: .01em; text-shadow: 0 1px 5px rgba(255,255,255,.92); }
 
 .home-stack { position: relative; z-index: 3; margin-top: -5px; padding: 0 11px 24px; display: grid; gap: 8px; }
 .card { border: 1px solid var(--line); border-radius: 18px; background: var(--paper); box-shadow: 0 6px 18px rgba(54, 77, 98, .055); }
