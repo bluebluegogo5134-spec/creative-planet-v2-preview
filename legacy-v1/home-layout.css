@@ -1,0 +1,101 @@
+/* Home page geometry only. Visual tokens live in theme.css; hero illustration composition lives in hero.css. */
+#home.page.active{
+  display:block;
+  overflow-y:auto;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+#home.page.active::-webkit-scrollbar{display:none}
+#home .content{
+  display:grid;
+  grid-template-rows:116px 248px 66px 110px;
+  gap:10px;
+  padding:10px 12px 22px;
+  min-height:auto;
+  flex:none;
+}
+#home .homeTop,
+#home .currentCard,
+#home .leaveCard,
+#home .weekCard{min-height:0;height:auto;flex:none}
+
+/* 进度卡：确认稿是轻量四列，而不是三块大数字 */
+#home .homeTop{padding:11px 12px}
+#home .homeTop .sectionTitle{font-size:17px;margin-bottom:3px}
+#home .homeTop>.small{font-size:10px}
+#home .homeTop .stats{grid-template-columns:repeat(4,1fr);gap:2px;margin-top:7px!important;align-items:end}
+#home .homeTop .stat{padding:0 3px;border-right:1px solid rgba(120,145,170,.15)}
+#home .homeTop .stat:nth-child(3){border-right:1px solid rgba(120,145,170,.15)}
+#home .homeTop .stat strong{font-size:17px;margin:2px 0 3px}
+#home .homeTop .stat .small{font-size:9px}
+#home .homeTop .bar{height:3px}
+#home .homeTop .stats::after{
+  content:"◎\A 14h";
+  white-space:pre;
+  display:flex;
+  height:52px;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.35;
+  font-weight:700;
+}
+
+/* 当前项目 + 独立开始创作横幅。wrapper 透明，两个视觉板块各自成卡片 */
+#home .currentCard{
+  position:relative;
+  overflow:visible;
+  padding:12px 14px;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+#home .currentCard::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;
+  height:128px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--card);
+  box-shadow:0 5px 16px rgba(55,98,144,.06);
+  z-index:0;
+}
+#home .currentCard>.sectionTitle,#home .currentTop,#home .nextLine{position:relative;z-index:2}
+#home .currentCard>.sectionTitle{font-size:17px;margin-bottom:7px}
+#home .currentTop{grid-template-columns:minmax(0,1fr) 66px;gap:7px}
+#home .currentTop select{min-height:36px;font-size:13px}
+#home .currentTop .secondary{min-height:36px;padding:6px 9px}
+#home .nextLine{margin-top:6px;line-height:1.35;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#home .gate{
+  position:absolute;
+  left:0;right:0;top:140px;
+  height:98px;
+  margin:0;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.18),rgba(248,251,247,.18)),
+    linear-gradient(90deg,rgba(249,242,225,.92) 0 10%,rgba(232,244,247,.74) 42% 58%,rgba(249,242,225,.92) 90% 100%),
+    url('./hero5.jpg') center 64%/cover no-repeat;
+  box-shadow:0 5px 16px rgba(55,98,144,.06);
+}
+#home .gate:before,#home .gate:after{content:"✿  ✦  ✿";bottom:7px;font-size:13px;opacity:.68}
+#home .gate button{bottom:27px;width:52%;min-height:35px;font-size:15px}
+#home .gate::marker{display:none}
+
+#home .leaveCard{padding:9px 14px;align-items:center}
+#home .leaveCard .sectionTitle{font-size:15px!important}
+#home .leaveCard .small{font-size:10px}
+#home .moon{font-size:20px}
+
+#home .weekCard{padding:9px 10px}
+#home .weekCard>.sectionTitle{font-size:15px!important;margin-bottom:6px!important}
+#home .weekStrip{height:68px;align-items:stretch}
+#home .dayChip{padding:4px 1px;min-width:0;border-radius:9px;font-size:8.5px}
+#home .dayChip b{font-size:10px}.dayChip .ic{font-size:13px;margin:3px 0}
+@media (display-mode:standalone){#home .content{padding-bottom:14px}}

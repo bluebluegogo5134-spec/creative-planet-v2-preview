@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+<defs>
+  <filter id="wc" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="noise"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="disp"/>
+    <feGaussianBlur in="noise" stdDeviation="0.45" result="softNoise"/>
+    <feBlend in="disp" in2="softNoise" mode="multiply"/>
+  </filter>
+  <linearGradient id="coat" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#93aa78"/><stop offset=".55" stop-color="#6f8f67"/><stop offset="1" stop-color="#536f55"/></linearGradient>
+  <linearGradient id="hair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f3cf5a"/><stop offset=".55" stop-color="#d6a63c"/><stop offset="1" stop-color="#b7812e"/></linearGradient>
+  <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#efc3a0"/><stop offset="1" stop-color="#d99d78"/></linearGradient>
+</defs>
+<g filter="url(#wc)">
+  <path d="M116 93 C145 84 179 86 213 101 C181 104 160 111 139 121 C166 118 191 124 216 140 C183 133 151 130 121 129Z" fill="#e5b43e" opacity=".88"/>
+  <path d="M93 118 C74 130 68 158 72 186 C91 202 122 201 143 186 C151 165 147 137 128 120Z" fill="url(#coat)" stroke="#536f55" stroke-width="1.3" opacity=".96"/>
+  <path d="M95 178 C82 179 64 188 58 200 C77 210 113 209 136 195 C126 184 113 179 95 178Z" fill="#6f8f67" stroke="#536f55" stroke-width="1.2"/>
+  <path d="M59 196 C49 197 42 203 40 211 C50 214 62 213 70 207Z" fill="#775035" opacity=".9"/>
+  <path d="M118 134 C131 145 135 159 130 176" fill="none" stroke="#d8a982" stroke-width="8" stroke-linecap="round" opacity=".85"/>
+  <rect x="100" y="100" width="16" height="18" rx="7" fill="#dfaa84" opacity=".9"/>
+  <ellipse cx="106" cy="82" rx="31" ry="34" fill="url(#skin)" stroke="#c98f6f" stroke-width="1.1"/>
+  <ellipse cx="132" cy="86" rx="5" ry="8" fill="#d8a17f"/>
+  <ellipse cx="90" cy="81" rx="2.6" ry="4.1" fill="#314052"/>
+  <path d="M84 88 q-5 4 1 6" fill="none" stroke="#b77d63" stroke-width="1.2"/>
+  <path d="M80 71 C69 60 74 48 84 49 C80 38 91 37 97 44 C100 32 113 36 114 45 C122 35 132 41 128 51 C141 46 145 57 136 65 C143 70 136 77 126 75 C115 67 98 64 80 71Z" fill="url(#hair)" stroke="#bd8d31" stroke-width="1.1"/>
+  <path d="M91 116 C107 110 126 111 141 119" fill="none" stroke="#d7a632" stroke-width="7" stroke-linecap="round" opacity=".9"/>
+</g>
+<g opacity=".18" fill="#fff"><ellipse cx="94" cy="65" rx="17" ry="8"/><ellipse cx="100" cy="138" rx="20" ry="11"/></g>
+</svg>

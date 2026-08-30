@@ -1,0 +1,516 @@
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { addDaysKey, getWeekStart, toDateKey } from './domain/date'
+import { CREATIVE_TYPES, type CreativeSession, type Project, type WeekPlanItem } from './domain/model'
+import { getElapsedMs } from './domain/timer'
+import { summarizeWeek, WEEKLY_MINUTE_GOAL, WEEKLY_NODE_GOAL } from './domain/weekly'
+import { weekDateKey } from './data/defaults'
+import { createBackup, restoreBackup } from './data/backup'
+import { useAppStore } from './store/useAppStore'
+
+type Page = 'home' | 'projects' | 'session' | 'plan' | 'review'
+
+const NAV: Array<{ id: Page; icon: string; label: string }> = [
+  { id: 'home', icon: '⌂', label: '首页' },
+  { id: 'projects', icon: '◉', label: '项目' },
+  { id: 'session', icon: '＋', label: '记录' },
+  { id: 'plan', icon: '☷', label: '计划' },
+  { id: 'review', icon: '✦', label: '复盘' }
+]
+
+function formatMinutes(minutes: number): string {
+  if (minutes < 60) return `${Math.round(minutes)}m`
+  const hours = Math.floor(minutes / 60)
+  const rest = Math.round(minutes % 60)
+  return rest ? `${hours}h ${rest}m` : `${hours}h`
+}
+
+function formatElapsed(ms: number): string {
+  const seconds = Math.max(0, Math.floor(ms / 1000))
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const rest = seconds % 60
+  return [hours, minutes, rest].map((value) => String(value).padStart(2, '0')).join(':')
+}
+
+function App() {
+  const [page, setPage] = useState<Page>('home')
+  const ready = useAppStore((state) => state.ready)
+  const error = useAppStore((state) => state.error)
+  const activeTimer = useAppStore((state) => state.activeTimer)
+  const init = useAppStore((state) => state.init)
+
+  useEffect(() => {
+    void init()
+  }, [init])
+
+  if (!ready) {
+    return (
+      <main className="app-shell loading-shell">
+        <div className="loading-orbit" aria-hidden="true">✦</div>
+        <p>正在回到你的创作星球……</p>
+        {error && <p className="error-banner">{error}</p>}
+      </main>
+    )
+  }
+
+  return (
+    <main className="app-shell">
+      {error && <div className="error-banner" role="alert">{error}</div>}
+      <div className="page-scroll">
+        {page === 'home' && <HomePage goTo={setPage} />}
+        {page === 'projects' && <ProjectsPage />}
+        {page === 'session' && <SessionPage />}
+        {page === 'plan' && <PlanPage />}
+        {page === 'review' && <ReviewPage />}
+      </div>
+      <nav className="bottom-nav" aria-label="主要导航">
+        {NAV.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={`nav-item ${page === item.id ? 'active' : ''} ${item.id === 'session' ? 'nav-create' : ''}`}
+            onClick={() => setPage(item.id)}
+            aria-current={page === item.id ? 'page' : undefined}
+          >
+            <span className="nav-icon">{item.id === 'session' && activeTimer.status !== 'idle' ? '●' : item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+    </main>
+  )
+}
+
+function HomePage({ goTo }: { goTo: (page: Page) => void }) {
+  const projects = useAppStore((state) => state.projects)
+  const sessions = useAppStore((state) => state.sessions)
+  const weekPlan = useAppStore((state) => state.weekPlan)
+  const currentProjectId = useAppStore((state) => state.currentProjectId)
+  const activeTimer = useAppStore((state) => state.activeTimer)
+  const setCurrentProject = useAppStore((state) => state.setCurrentProject)
+  const currentWeek = getWeekStart(Date.now())
+  const summary = useMemo(() => summarizeWeek(sessions, currentWeek), [sessions, currentWeek])
+  const project = projects.find((item) => item.id === currentProjectId) ?? projects[0]
+  const recent = sessions.slice(0, 3)
+  const completedDates = new Set(
+    sessions
+      .filter((session) => session.weekStart === currentWeek && session.type !== '健身')
+      .map((session) => session.dateKey)
+  )
+
+  return (
+    <>
+      <header className="home-hero" style={{ backgroundImage: 'linear-gradient(90deg, rgba(255,252,242,.96), rgba(232,242,251,.18)), url("./assets/hero2.jpg")' }}>
+        <div className="hero-copy">
+          <span>创作星球</span>
+          <h1>慢一点也没关系，<br />但不要离自己的星球太远</h1>
+        </div>
+      </header>
+
+      <section className="content-stack home-stack">
+        <article className="card progress-card">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">本周达标进度</p>
+              <h2>{summary.passed ? '这一周，星球已经亮起来了' : '守住四次创作连接'}</h2>
+            </div>
+            <span className={`status-seal ${summary.passed ? 'passed' : ''}`}>{summary.passed ? '达标' : '进行中'}</span>
+          </div>
+          <div className="metric-grid">
+            <Metric label="创作节点" value={`${summary.nodeCount}/${WEEKLY_NODE_GOAL}`} progress={summary.nodeCount / WEEKLY_NODE_GOAL} />
+            <Metric label="累计时长" value={formatMinutes(summary.creativeMinutes)} progress={summary.creativeMinutes / WEEKLY_MINUTE_GOAL} />
+            <Metric label="健身" value={`${summary.gymCount}次`} progress={summary.gymCount / 2} tone="green" />
+          </div>
+        </article>
+
+        <article className="card current-project-card">
+          <div className="section-heading compact">
+            <div>
+              <p className="eyebrow">当前创作</p>
+              <h2>{project?.name ?? '先建立一颗项目星球'}</h2>
+            </div>
+            <button className="text-button" type="button" onClick={() => goTo('projects')}>项目管理</button>
+          </div>
+          {projects.length > 0 && (
+            <select value={currentProjectId} onChange={(event) => void setCurrentProject(event.target.value)} aria-label="切换当前项目">
+              {projects.filter((item) => item.status === 'active').map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            </select>
+          )}
+          <p className="next-action">下一步：{project?.nextAction || '还没有设置下一步'}</p>
+          <button className="primary-button create-gate" type="button" onClick={() => goTo('session')}>
+            {activeTimer.status === 'idle' ? '✦ 开始创作' : activeTimer.status === 'paused' ? '✦ 回去继续' : '✦ 创作进行中'}
+          </button>
+        </article>
+
+        <article className="card leave-card">
+          <span className="moon">☾</span>
+          <div>
+            <p className="eyebrow">上次离开时</p>
+            <p>{recent[0]?.nextAction || '还没有记录，今天可以从很小的一步开始。'}</p>
+          </div>
+        </article>
+
+        <article className="card week-card">
+          <div className="section-heading compact">
+            <h2>本周计划</h2>
+            <button className="text-button" type="button" onClick={() => goTo('plan')}>调整</button>
+          </div>
+          <div className="week-strip">
+            {weekPlan.map((item) => {
+              const dateKey = weekDateKey(item)
+              return (
+                <div className={`day-chip ${completedDates.has(dateKey) ? 'done' : ''}`} key={item.id}>
+                  <b>{item.dayLabel.replace('周', '')}</b>
+                  <span>{item.type === '创作' ? '🪶' : item.type === '健身' ? '🏋️' : item.type === '自由' ? '⭐' : '☾'}</span>
+                  <small>{completedDates.has(dateKey) ? '完成' : item.type}</small>
+                </div>
+              )
+            })}
+          </div>
+        </article>
+
+        <article className="card recent-card">
+          <div className="section-heading compact"><h2>最近记录</h2><button className="text-button" type="button" onClick={() => goTo('session')}>查看</button></div>
+          {recent.length ? recent.map((item) => <SessionLine key={item.id} session={item} projects={projects} />) : <p className="empty-copy">还没有创作记录。</p>}
+        </article>
+      </section>
+    </>
+  )
+}
+
+function Metric({ label, value, progress, tone = 'blue' }: { label: string; value: string; progress: number; tone?: 'blue' | 'green' }) {
+  return (
+    <div className="metric">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <div className="progress-track"><i className={tone} style={{ width: `${Math.min(100, Math.max(0, progress * 100))}%` }} /></div>
+    </div>
+  )
+}
+
+function ProjectsPage() {
+  const projects = useAppStore((state) => state.projects)
+  const sessions = useAppStore((state) => state.sessions)
+  const currentProjectId = useAppStore((state) => state.currentProjectId)
+  const addProject = useAppStore((state) => state.addProject)
+  const setCurrentProject = useAppStore((state) => state.setCurrentProject)
+  const updateProject = useAppStore((state) => state.updateProject)
+  const archiveProject = useAppStore((state) => state.archiveProject)
+  const [name, setName] = useState('')
+
+  async function createProject() {
+    await addProject(name)
+    setName('')
+  }
+
+  return (
+    <PageFrame eyebrow="把每一个想法，孕育成一颗星球" title="项目星系" image="hero1.jpg">
+      <article className="card create-project-form">
+        <label htmlFor="new-project">新项目</label>
+        <div className="inline-form">
+          <input id="new-project" value={name} onChange={(event) => setName(event.target.value)} placeholder="例如：县城就业" />
+          <button className="primary-button" type="button" onClick={() => void createProject()}>新建</button>
+        </div>
+      </article>
+      <div className="project-list">
+        {projects.filter((project) => project.status === 'active').map((project) => {
+          const minutes = sessions.filter((session) => session.projectId === project.id).reduce((sum, session) => sum + session.durationMinutes, 0)
+          return <ProjectCard key={project.id} project={project} minutes={minutes} current={project.id === currentProjectId} select={() => void setCurrentProject(project.id)} save={updateProject} archive={archiveProject} />
+        })}
+      </div>
+      <DataSafetyCard />
+    </PageFrame>
+  )
+}
+
+function ProjectCard({ project, minutes, current, select, save, archive }: { project: Project; minutes: number; current: boolean; select: () => void; save: (project: Project) => Promise<void>; archive: (id: string) => Promise<void> }) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(project)
+
+  async function submit() {
+    await save({ ...draft, name: draft.name.trim() || project.name })
+    setEditing(false)
+  }
+
+  return (
+    <article className={`card project-card ${current ? 'current' : ''}`}>
+      {editing ? (
+        <div className="edit-project-grid">
+          <label>项目名<input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+          <label>阶段<input value={draft.stage} onChange={(event) => setDraft({ ...draft, stage: event.target.value })} /></label>
+          <label>下一步<textarea value={draft.nextAction} onChange={(event) => setDraft({ ...draft, nextAction: event.target.value })} /></label>
+          <div className="button-row"><button className="secondary-button" type="button" onClick={() => setEditing(false)}>取消</button><button className="primary-button" type="button" onClick={() => void submit()}>保存</button></div>
+        </div>
+      ) : (
+        <>
+          <div className="section-heading compact">
+            <div><h2>{project.name}</h2><span className="tag">{project.stage}</span></div>
+            <span className="project-hours">{formatMinutes(minutes)}</span>
+          </div>
+          <p className="next-action">下一步：{project.nextAction}</p>
+          <div className="three-button-row">
+            <button className="secondary-button" type="button" onClick={() => { setDraft(project); setEditing(true) }}>编辑</button>
+            <button className={current ? 'quiet-button' : 'primary-button'} type="button" disabled={current} onClick={select}>{current ? '当前项目' : '设为当前'}</button>
+            <button className="archive-button" type="button" onClick={() => { if (window.confirm(`将“${project.name}”移入归档？历史记录会保留。`)) void archive(project.id) }}>归档</button>
+          </div>
+        </>
+      )}
+    </article>
+  )
+}
+
+function DataSafetyCard() {
+  const [status, setStatus] = useState('')
+
+  async function download() {
+    const backup = await createBackup()
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `创作星球备份-${toDateKey(Date.now())}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setStatus('备份已导出')
+  }
+
+  async function importFile(file: File) {
+    try {
+      const parsed = JSON.parse(await file.text())
+      if (!window.confirm('导入会用备份内容替换当前设备上的《创作星球》数据，确定继续吗？')) return
+      await restoreBackup(parsed)
+      window.location.reload()
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : '导入失败')
+    }
+  }
+
+  return (
+    <article className="card data-card">
+      <div><p className="eyebrow">数据安全</p><h2>给创作留下可恢复的副本</h2><p className="empty-copy">数据只保存在当前设备。建议定期导出 JSON 备份。</p></div>
+      <div className="button-row"><button className="secondary-button" type="button" onClick={() => void download()}>导出备份</button><label className="file-button">导入备份<input type="file" accept="application/json,.json" onChange={(event) => { const file = event.target.files?.[0]; if (file) void importFile(file); event.target.value = '' }} /></label></div>
+      {status && <p className="data-status" role="status">{status}</p>}
+    </article>
+  )
+}
+
+function SessionPage() {
+  const projects = useAppStore((state) => state.projects).filter((project) => project.status === 'active')
+  const sessions = useAppStore((state) => state.sessions)
+  const currentProjectId = useAppStore((state) => state.currentProjectId)
+  const activeTimer = useAppStore((state) => state.activeTimer)
+  const startTimer = useAppStore((state) => state.startTimer)
+  const pauseTimer = useAppStore((state) => state.pauseTimer)
+  const resumeTimer = useAppStore((state) => state.resumeTimer)
+  const finishTimer = useAppStore((state) => state.finishTimer)
+  const addManualSession = useAppStore((state) => state.addManualSession)
+  const updateSession = useAppStore((state) => state.updateSession)
+  const deleteSession = useAppStore((state) => state.deleteSession)
+  const [projectId, setProjectId] = useState(currentProjectId)
+  const [type, setType] = useState<(typeof CREATIVE_TYPES)[number]>('写作')
+  const [goal, setGoal] = useState('')
+  const [showFinish, setShowFinish] = useState(false)
+  const [showManual, setShowManual] = useState(false)
+  const [editingSession, setEditingSession] = useState<CreativeSession | null>(null)
+  const [tick, setTick] = useState(Date.now())
+
+  useEffect(() => {
+    if (activeTimer.status === 'idle') return
+    setTick(Date.now())
+    const interval = window.setInterval(() => setTick(Date.now()), 1000)
+    return () => window.clearInterval(interval)
+  }, [activeTimer.status])
+
+  const selectedProjectId = activeTimer.status !== 'idle' ? activeTimer.projectId : projectId
+  const activeProject = projects.find((project) => project.id === selectedProjectId)
+
+  return (
+    <PageFrame eyebrow="走进花丛小径，进入你的故事" title="开始创作" image="hero5.jpg">
+      <article className="card timer-card">
+        {activeTimer.status === 'idle' ? (
+          <>
+            <label>选择项目<select value={projectId} onChange={(event) => setProjectId(event.target.value)}>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></label>
+            <div className="two-column-form">
+              <label>这次做什么<select value={type} onChange={(event) => setType(event.target.value as typeof type)}>{CREATIVE_TYPES.map((item) => <option key={item}>{item}</option>)}</select></label>
+              <label>只推进一件事<input value={goal} onChange={(event) => setGoal(event.target.value)} placeholder="写下这次目标" /></label>
+            </div>
+            <div className="timer-display">00:00:00</div>
+            <div className="button-row"><button className="primary-button" type="button" disabled={!projectId} onClick={() => void startTimer(projectId, type, goal)}>开始计时</button><button className="secondary-button" type="button" onClick={() => setShowManual(true)}>手动补录</button></div>
+          </>
+        ) : (
+          <>
+            <div className="active-session-copy"><span>{activeTimer.status === 'paused' ? '已暂停' : '创作进行中'}</span><h2>{activeProject?.name}</h2><p>{activeTimer.goal || activeTimer.type}</p></div>
+            <div className="timer-display active">{formatElapsed(getElapsedMs(activeTimer, tick))}</div>
+            <div className="button-row">
+              {activeTimer.status === 'running' ? <button className="secondary-button" type="button" onClick={() => void pauseTimer()}>暂停</button> : <button className="primary-button" type="button" onClick={() => void resumeTimer()}>恢复</button>}
+              <button className="primary-button" type="button" onClick={() => setShowFinish(true)}>结束并记录</button>
+            </div>
+          </>
+        )}
+      </article>
+
+      {showFinish && activeTimer.status !== 'idle' && <FinishPanel close={() => setShowFinish(false)} save={async (input) => { await finishTimer(input); setShowFinish(false); setGoal('') }} />}
+      {showManual && <ManualPanel projects={projects} close={() => setShowManual(false)} save={async (input) => { await addManualSession(input); setShowManual(false) }} />}
+      {editingSession && <EditSessionPanel session={editingSession} projects={projects} close={() => setEditingSession(null)} save={async (input) => { await updateSession(editingSession.id, input); setEditingSession(null) }} />}
+
+      <article className="card records-card">
+        <div className="section-heading compact"><h2>最近记录</h2><button className="text-button" type="button" onClick={() => setShowManual(true)}>补录</button></div>
+        {sessions.length ? sessions.slice(0, 12).map((session) => (
+          <div className="record-row" key={session.id}>
+            <SessionLine session={session} projects={projects} />
+            <div className="record-actions"><button className="edit-button" type="button" onClick={() => setEditingSession(session)}>编辑</button><button className="delete-button" type="button" onClick={() => { if (window.confirm('确定删除这条记录吗？此操作不能撤销。')) void deleteSession(session.id) }}>删除</button></div>
+          </div>
+        )) : <p className="empty-copy">还没有记录，先从今天的一小步开始。</p>}
+      </article>
+    </PageFrame>
+  )
+}
+
+function FinishPanel({ close, save }: { close: () => void; save: (input: { done: string; nextAction: string; mood: string }) => Promise<void> }) {
+  const [done, setDone] = useState('')
+  const [nextAction, setNextAction] = useState('')
+  const [mood, setMood] = useState('慢慢进去了')
+  return (
+    <article className="card finish-panel">
+      <h2>结束这次创作</h2>
+      <label>这次推进了什么？<textarea value={done} onChange={(event) => setDone(event.target.value)} /></label>
+      <label>下一次从哪里继续？<textarea value={nextAction} onChange={(event) => setNextAction(event.target.value)} /></label>
+      <fieldset><legend>进入状态怎么样？</legend><div className="mood-row">{['很难进去', '慢慢进去了', '很沉浸'].map((item) => <button key={item} type="button" className={mood === item ? 'selected' : ''} onClick={() => setMood(item)}>{item}</button>)}</div></fieldset>
+      <div className="button-row"><button className="secondary-button" type="button" onClick={close}>返回</button><button className="primary-button" type="button" onClick={() => void save({ done, nextAction, mood })}>保存记录</button></div>
+    </article>
+  )
+}
+
+function ManualPanel({ projects, close, save }: { projects: Project[]; close: () => void; save: (input: { dateKey: string; projectId: string | null; type: CreativeSession['type']; minutes: number; done: string }) => Promise<void> }) {
+  const [dateKey, setDateKey] = useState(toDateKey(Date.now()))
+  const [projectId, setProjectId] = useState(projects[0]?.id ?? '')
+  const [type, setType] = useState<CreativeSession['type']>('写作')
+  const [minutes, setMinutes] = useState(60)
+  const [done, setDone] = useState('')
+  return (
+    <article className="card finish-panel">
+      <h2>手动补录</h2>
+      <div className="two-column-form"><label>日期<input type="date" value={dateKey} onChange={(event) => setDateKey(event.target.value)} /></label><label>分钟<input type="number" min="1" max="1440" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} /></label></div>
+      <label>类型<select value={type} onChange={(event) => setType(event.target.value as CreativeSession['type'])}>{[...CREATIVE_TYPES, '健身'].map((item) => <option key={item}>{item}</option>)}</select></label>
+      {type !== '健身' && <label>项目<select value={projectId} onChange={(event) => setProjectId(event.target.value)}>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></label>}
+      <label>推进了什么<textarea value={done} onChange={(event) => setDone(event.target.value)} /></label>
+      <div className="button-row"><button className="secondary-button" type="button" onClick={close}>取消</button><button className="primary-button" type="button" onClick={() => void save({ dateKey, projectId: type === '健身' ? null : projectId, type, minutes, done })}>保存补录</button></div>
+    </article>
+  )
+}
+
+function EditSessionPanel({ session, projects, close, save }: { session: CreativeSession; projects: Project[]; close: () => void; save: (input: { dateKey: string; projectId: string | null; type: CreativeSession['type']; minutes: number; done: string; nextAction: string; mood: string }) => Promise<void> }) {
+  const [dateKey, setDateKey] = useState(session.dateKey)
+  const [projectId, setProjectId] = useState(session.projectId ?? projects[0]?.id ?? '')
+  const [type, setType] = useState<CreativeSession['type']>(session.type)
+  const [minutes, setMinutes] = useState(session.durationMinutes)
+  const [done, setDone] = useState(session.done)
+  const [nextAction, setNextAction] = useState(session.nextAction)
+  const [mood, setMood] = useState(session.mood)
+
+  return (
+    <article className="card finish-panel">
+      <h2>编辑记录</h2>
+      <div className="two-column-form"><label>日期<input type="date" value={dateKey} onChange={(event) => setDateKey(event.target.value)} /></label><label>分钟<input type="number" min="1" max="1440" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} /></label></div>
+      <label>类型<select value={type} onChange={(event) => setType(event.target.value as CreativeSession['type'])}>{[...CREATIVE_TYPES, '健身'].map((item) => <option key={item}>{item}</option>)}</select></label>
+      {type !== '健身' && <label>项目<select value={projectId} onChange={(event) => setProjectId(event.target.value)}>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></label>}
+      <label>推进了什么<textarea value={done} onChange={(event) => setDone(event.target.value)} /></label>
+      <label>下一次从哪里继续<textarea value={nextAction} onChange={(event) => setNextAction(event.target.value)} /></label>
+      <label>进入状态<input value={mood} onChange={(event) => setMood(event.target.value)} placeholder="例如：很沉浸" /></label>
+      <div className="button-row"><button className="secondary-button" type="button" onClick={close}>取消</button><button className="primary-button" type="button" disabled={type !== '健身' && !projectId} onClick={() => void save({ dateKey, projectId: type === '健身' ? null : projectId, type, minutes, done, nextAction, mood })}>保存修改</button></div>
+    </article>
+  )
+}
+
+function PlanPage() {
+  const plan = useAppStore((state) => state.weekPlan)
+  const updatePlanItem = useAppStore((state) => state.updatePlanItem)
+  return (
+    <PageFrame eyebrow="计划是边界，不是考勤" title="本周计划" image="hero4.jpg">
+      <p className="page-intro">计划完成与实际创作节点分别计算。临时在计划外创作，也会如实计入实际节点。</p>
+      <div className="plan-list">{plan.map((item) => <PlanItem key={item.id} item={item} save={updatePlanItem} />)}</div>
+    </PageFrame>
+  )
+}
+
+function PlanItem({ item, save }: { item: WeekPlanItem; save: (item: WeekPlanItem) => Promise<void> }) {
+  const [draft, setDraft] = useState(item)
+  const changed = JSON.stringify(draft) !== JSON.stringify(item)
+  useEffect(() => setDraft(item), [item])
+  return (
+    <article className="card plan-item">
+      <div className="section-heading compact"><div><h2>{item.dayLabel}</h2><small>{addDaysKey(item.weekStart, item.dayIndex)}</small></div>{changed && <button className="primary-button small-button" type="button" onClick={() => void save(draft)}>保存</button>}</div>
+      <div className="plan-form-grid">
+        <label>类型<select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as WeekPlanItem['type'] })}>{['创作', '健身', '自由', '休息'].map((type) => <option key={type}>{type}</option>)}</select></label>
+        <label>开始<input type="time" value={draft.start} onChange={(event) => setDraft({ ...draft, start: event.target.value })} /></label>
+        <label>结束<input type="time" value={draft.end} onChange={(event) => setDraft({ ...draft, end: event.target.value })} /></label>
+      </div>
+      <label>备注<input value={draft.note} onChange={(event) => setDraft({ ...draft, note: event.target.value })} /></label>
+      <label className="checkbox-line"><input type="checkbox" checked={draft.countsAsPlannedNode} onChange={(event) => setDraft({ ...draft, countsAsPlannedNode: event.target.checked })} />计划为创作连接</label>
+    </article>
+  )
+}
+
+function ReviewPage() {
+  const projects = useAppStore((state) => state.projects)
+  const sessions = useAppStore((state) => state.sessions)
+  const review = useAppStore((state) => state.weekReview)
+  const saveReview = useAppStore((state) => state.saveReview)
+  const [done, setDone] = useState(review?.done ?? '')
+  const [nextWeekGoal, setNextWeekGoal] = useState(review?.nextWeekGoal ?? '')
+  const weekStart = getWeekStart(Date.now())
+  const summary = summarizeWeek(sessions, weekStart)
+  const inWeek = sessions.filter((session) => session.weekStart === weekStart && session.type !== '健身')
+  const byType = groupMinutes(inWeek, (session) => session.type)
+  const byProject = groupMinutes(inWeek, (session) => projects.find((project) => project.id === session.projectId)?.name ?? '未归属项目')
+
+  useEffect(() => { setDone(review?.done ?? ''); setNextWeekGoal(review?.nextWeekGoal ?? '') }, [review])
+
+  return (
+    <PageFrame eyebrow="每一次回望，都是与未来的自己对话" title="本周复盘" image="hero3.jpg">
+      <article className="card review-summary">
+        <div className="metric-grid"><Metric label="节点" value={`${summary.nodeCount}/4`} progress={summary.nodeCount / 4} /><Metric label="创作" value={formatMinutes(summary.creativeMinutes)} progress={summary.creativeMinutes / 840} /><Metric label="结果" value={summary.passed ? '达标' : '未达标'} progress={summary.passed ? 1 : 0} tone={summary.passed ? 'green' : 'blue'} /></div>
+      </article>
+      <div className="review-breakdown"><Breakdown title="时间去了哪里" items={byType} /><Breakdown title="项目投入" items={byProject} /></div>
+      <article className="card review-form">
+        <label>这周我做成了什么？<textarea value={done} onChange={(event) => setDone(event.target.value)} /></label>
+        <label>下周最重要的一个作品增量<textarea value={nextWeekGoal} onChange={(event) => setNextWeekGoal(event.target.value)} /></label>
+        <button className="primary-button" type="button" onClick={() => void saveReview(done, nextWeekGoal)}>保存本周复盘</button>
+      </article>
+    </PageFrame>
+  )
+}
+
+function groupMinutes(sessions: CreativeSession[], key: (session: CreativeSession) => string): Array<[string, number]> {
+  const groups = new Map<string, number>()
+  sessions.forEach((session) => groups.set(key(session), (groups.get(key(session)) ?? 0) + session.durationMinutes))
+  return [...groups.entries()].sort((a, b) => b[1] - a[1])
+}
+
+function Breakdown({ title, items }: { title: string; items: Array<[string, number]> }) {
+  return <article className="card breakdown-card"><h2>{title}</h2>{items.length ? items.slice(0, 5).map(([label, minutes]) => <div className="breakdown-line" key={label}><span>{label}</span><b>{formatMinutes(minutes)}</b></div>) : <p className="empty-copy">暂无记录</p>}</article>
+}
+
+function SessionLine({ session, projects }: { session: CreativeSession; projects: Project[] }) {
+  const project = projects.find((item) => item.id === session.projectId)
+  return (
+    <div className="session-line">
+      <span className="session-date">{session.dateKey.slice(5)}</span>
+      <div><b>{session.type}{project ? ` · ${project.name}` : ''}</b><small>{session.done || session.goal || '留下了一次创作连接'}</small></div>
+      <strong>{formatMinutes(session.durationMinutes)}</strong>
+    </div>
+  )
+}
+
+function PageFrame({ eyebrow, title, image, children }: { eyebrow: string; title: string; image: string; children: ReactNode }) {
+  return (
+    <>
+      <header className="page-hero" style={{ backgroundImage: `linear-gradient(180deg, rgba(255,255,255,.08), rgba(237,245,251,.86)), url("./assets/${image}")` }}>
+        <p>{eyebrow}</p><h1>{title}</h1>
+      </header>
+      <section className="content-stack">{children}</section>
+    </>
+  )
+}
+
+export default App

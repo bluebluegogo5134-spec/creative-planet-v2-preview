@@ -1,0 +1,70 @@
+/* 首页 Hero：固定移动端头图高度，避免 iOS Safari 对 aspect-ratio + flex 的异常计算。 */
+#home .hero.homeHero{
+  position:relative;
+  width:100%;
+  height:268px !important;
+  min-height:268px !important;
+  max-height:268px !important;
+  flex:0 0 268px !important;
+  aspect-ratio:auto !important;
+  overflow:hidden;
+  border-radius:0 0 24px 24px;
+  background:#f8f3e7 url('./assets/home-hero-1200x760.jpg?v=2') center 58% / cover no-repeat;
+  isolation:isolate;
+}
+#home .hero.homeHero:after{display:none}
+.homeHero-art{display:none !important}
+.homeHero-copy{
+  position:absolute;
+  z-index:1;
+  left:20px;
+  top:max(43px,calc(env(safe-area-inset-top) + 17px));
+  width:auto;
+  max-width:none;
+  color:var(--ink);
+  pointer-events:none;
+}
+.homeHero-label{margin:0 0 11px;color:var(--ink-soft);font-size:11px;line-height:1.2;letter-spacing:.18em}
+.homeHero-quote{
+  position:relative;
+  display:inline-block;
+  margin:0;
+  color:var(--ink);
+  font-family:var(--font-art);
+  font-size:17px;
+  font-weight:600;
+  line-height:1.62;
+  letter-spacing:-.02em;
+  white-space:nowrap;
+  text-shadow:0 1px 0 rgba(255,255,255,.84);
+  pointer-events:auto;
+}
+.homeHero-edit{
+  position:absolute;
+  left:calc(100% + 6px);
+  bottom:1px;
+  display:grid;
+  place-items:center;
+  width:25px;height:25px;padding:0;
+  border:1px solid rgba(88,107,126,.10);border-radius:50%;
+  background:rgba(255,253,247,.82);color:var(--ink-soft);
+  font-size:12px;line-height:1;box-shadow:0 2px 8px rgba(57,73,89,.05)
+}
+.homeHero-edit:active{transform:scale(.96)}
+@media(max-width:375px){
+  #home .hero.homeHero{height:252px!important;min-height:252px!important;max-height:252px!important;flex-basis:252px!important}
+  .homeHero-copy{left:17px;top:max(39px,calc(env(safe-area-inset-top) + 14px))}
+  .homeHero-label{font-size:10px;margin-bottom:9px}
+  .homeHero-quote{font-size:15px}
+  .homeHero-edit{width:23px;height:23px;font-size:11px;left:calc(100% + 3px)}
+}
+@media(min-width:376px) and (max-width:390px){
+  #home .hero.homeHero{height:258px!important;min-height:258px!important;max-height:258px!important;flex-basis:258px!important}
+  .homeHero-copy{left:18px;top:max(41px,calc(env(safe-area-inset-top) + 15px))}
+  .homeHero-quote{font-size:15.5px}
+}
+@media(min-width:391px) and (max-width:402px){
+  #home .hero.homeHero{height:262px!important;min-height:262px!important;max-height:262px!important;flex-basis:262px!important}
+  .homeHero-copy{left:19px}
+  .homeHero-quote{font-size:16px}
+}

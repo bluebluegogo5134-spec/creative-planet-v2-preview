@@ -1,0 +1,23 @@
+:root{
+  /* 只放视觉变量：改颜色时不碰布局 */
+  --paper:#fffdf7;
+  --paper-soft:#fbf8ef;
+  --wash-blue:#eaf4f8;
+  --wash-blue-2:#dceef6;
+  --ink:#234b79;
+  --ink-soft:#6f839d;
+  --line:#d9e6ef;
+  --gold:#e8bc54;
+  --flower-pink:#dca0b2;
+  --flower-lilac:#9f9aca;
+  --leaf:#7ca58c;
+  --cta:#557fc8;
+  --cta-2:#7e8cde;
+  --card:rgba(255,253,247,.94);
+  --shadow:0 6px 20px rgba(63,90,115,.08);
+  --radius-lg:22px;
+  --radius-md:16px;
+  --navH:70px;
+  --font-ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
+  --font-art:STKaiti,KaiTi,"Songti SC",serif;
+}

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eef7ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="创作星球">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>创作星球</title>
+<link rel="stylesheet" href="./theme.css?v=2">
+<link rel="stylesheet" href="./styles.css?v=4">
+<link rel="stylesheet" href="./hero.css?v=5">
+<link rel="stylesheet" href="./home-layout.css?v=1">
+</head>
+<body>
+<div id="app">
+<section id="home" class="page active">
+  <div class="hero homeHero" aria-label="创作星球首页插画">
+    <img class="homeHero-art" src="./assets/home-hero-1200x760.jpg?v=2" width="1200" height="760" alt="少年坐在自己的小星球上，身边有一朵玫瑰，远处是星空" decoding="async" fetchpriority="high">
+    <div class="homeHero-copy">
+      <div class="homeHero-label">创作星球</div>
+      <p class="homeHero-quote"><span id="homeQuote">慢一点也没关系，<br>但不要离自己的星球太远</span><button id="editQuote" class="homeHero-edit" aria-label="编辑鼓励语">✎</button></p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card homeTop">
+      <div class="sectionTitle">✦ 本周达标进度</div>
+      <div class="small">4 个创作节点 + 累计创作 ≥ 14 小时</div>
+      <div class="stats" style="margin-top:7px">
+        <div class="stat"><span class="small">创作节点</span><strong id="nodeStat">0/4</strong><div class="bar"><span id="nodeBar" style="width:0"></span></div></div>
+        <div class="stat"><span class="small">累计时长</span><strong id="weekTimeStat">0h</strong><div class="bar"><span id="timeBar" style="width:0"></span></div></div>
+        <div class="stat"><span class="small">健身</span><strong id="gymStat">0次</strong><div class="bar"><span id="gymBar" style="width:0;background:linear-gradient(90deg,#78c0a2,#5ba98b)"></span></div></div>
+      </div>
+    </div>
+    <div class="card currentCard">
+      <div class="sectionTitle">当前创作</div>
+      <div class="currentTop"><select id="homeProject"></select><button id="goProjects" class="secondary">项目</button></div>
+      <div class="small nextLine">下一步：<span id="homeNext">未设置</span></div>
+      <div class="gate"><button id="startFromHome" class="primary">✦ 开始创作</button></div>
+    </div>
+    <div class="card leaveCard"><div class="moon">☾</div><div><div class="sectionTitle" style="font-size:16px;margin:0 0 2px">上次离开时</div><div id="lastLeave" class="small">还没有记录。</div></div></div>
+    <div class="card weekCard"><div class="sectionTitle" style="font-size:17px;margin-bottom:6px">本周计划</div><div id="weekStrip" class="weekStrip"></div></div>
+  </div>
+</section>
+
+<section id="projects" class="page">
+  <div class="hero" style="background-image:url('./hero2.jpg')"><div class="heroText"><div class="kicker">把每一个想法，孕育成一颗星球</div><div class="heroTitle">项目星系</div></div></div>
+  <div class="content">
+    <div class="card projectCreate"><div class="row"><input id="newProject" placeholder="输入项目名，例如：县城就业"><button id="addProject" class="primary">＋ 新建</button></div></div>
+    <div class="card projectMain"><div class="sectionTitle">我的项目</div><div id="projectCarousel" class="projectCarousel"></div></div>
+    <div class="card projectFoot"><div class="small">项目可并行存在；每次创作只选择一个。项目多时横向滑动，不占纵向空间。</div></div>
+  </div>
+</section>
+
+<section id="session" class="page">
+  <div class="hero" style="background-image:url('./hero5.jpg')"><div class="heroText"><div class="kicker">走进花丛小径，进入你的故事</div><div class="heroTitle">开始创作</div></div></div>
+  <div class="content">
+    <div class="card sessionCard">
+      <div class="formLabel">选择项目</div><select id="sessionProject"></select>
+      <div class="formLabel">这次做什么</div>
+      <div class="sessionGrid"><select id="sessionType"><option>写作</option><option>研究</option><option>剪辑</option><option>拍摄</option><option>采访</option><option>分镜</option><option>阅读输入</option><option>复盘</option><option>其他</option></select><input id="sessionGoal" placeholder="只推进一件事"></div>
+      <div id="timer" class="timer">00:00:00</div>
+      <div class="sessionActions"><button id="timerBtn" class="primary">开始计时</button><button id="manualBtn" class="secondary">手动补录</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="week" class="page">
+  <div class="hero" style="background-image:url('./hero4.jpg')"><div class="heroText"><div class="kicker">计划是边界，不是考勤</div><div class="heroTitle">本周计划</div></div></div>
+  <div class="content">
+    <div class="card weekIntro"><div class="small">7 天都能改类型、时间和是否计入创作节点。</div></div>
+    <div id="weekGrid" class="weekGrid"></div>
+  </div>
+</section>
+
+<section id="review" class="page">
+  <div class="hero" style="background-image:url('./hero3.jpg')"><div class="heroText"><div class="kicker">每一次回望，都是与未来的自己对话</div><div class="heroTitle">本周复盘</div></div></div>
+  <div class="content">
+    <div class="card reviewTop">
+      <div class="sectionTitle">本周结果</div>
+      <div class="stats"><div class="stat"><span class="small">节点</span><strong id="reviewNodes">0/4</strong></div><div class="stat"><span class="small">创作</span><strong id="reviewHours">0h</strong></div><div class="stat"><span class="small">达标</span><strong id="reviewPass">否</strong></div></div>
+    </div>
+    <div class="reviewGrid">
+      <div class="reviewBox"><div class="sectionTitle" style="font-size:16px">时间去了哪里</div><div id="typeBreak"></div></div>
+      <div class="reviewBox"><div class="sectionTitle" style="font-size:16px">项目投入</div><div id="projectBreak"></div></div>
+    </div>
+    <div class="card reviewFoot">
+      <div class="reviewSummary"><div><div class="sectionTitle" style="font-size:16px;margin-bottom:2px">本周复盘</div><div id="reviewPreview" class="small">还没有写本周复盘。</div></div><button id="openReview" class="primary">填写</button></div>
+    </div>
+  </div>
+</section>
+
+<nav class="bottomNav">
+  <button class="nav active" data-page="home"><b>⌂</b>首页</button>
+  <button class="nav" data-page="projects"><b>◉</b>项目</button>
+  <button class="nav" data-page="session"><b class="plus">＋</b>记录</button>
+  <button class="nav" data-page="week"><b>☷</b>计划</button>
+  <button class="nav" data-page="review"><b>✦</b>复盘</button>
+</nav>
+</div>
+
+<div id="quoteModal" class="modal"><div class="sheet"><div class="sectionTitle">修改顶部鼓励语</div><textarea id="quoteInput"></textarea><div class="actionRow"><button class="secondary close">取消</button><button id="saveQuote" class="primary">保存</button></div></div></div>
+<div id="planModal" class="modal"><div class="sheet"><div id="planTitle" class="sectionTitle">调整计划</div><div class="formLabel">类型</div><select id="planType"><option>创作</option><option>健身</option><option>自由</option><option>休息</option></select><div class="row"><div style="flex:1"><div class="formLabel">开始</div><input id="planStart" type="time"></div><div style="flex:1"><div class="formLabel">结束</div><input id="planEnd" type="time"></div></div><div class="formLabel">是否计入创作节点</div><select id="planNode"><option value="true">是</option><option value="false">否</option></select><div class="formLabel">备注</div><input id="planNote"><div class="actionRow"><button class="secondary close">取消</button><button id="savePlan" class="primary">保存</button></div></div></div>
+<div id="endModal" class="modal"><div class="sheet"><div class="sectionTitle">结束这次创作</div><div class="small">本次时长：<b id="endDuration"></b></div><div class="formLabel">这次推进了什么？</div><textarea id="endDone"></textarea><div class="formLabel">下一次从哪里继续？</div><textarea id="endNext"></textarea><div class="formLabel">进入状态怎么样？</div><div class="moods"><button class="mood" data-mood="很难进去">😵 很难</button><button class="mood" data-mood="慢慢进去了">🙂 慢慢进入</button><button class="mood" data-mood="很沉浸">✦ 很沉浸</button></div><div class="actionRow"><button class="secondary close">返回</button><button id="saveSession" class="primary">保存记录</button></div></div></div>
+<div id="manualModal" class="modal"><div class="sheet"><div class="sectionTitle">手动补录</div><div class="formLabel">日期</div><input id="manualDate" type="date"><div class="formLabel">项目</div><select id="manualProject"></select><div class="formLabel">类型</div><select id="manualType"><option>写作</option><option>研究</option><option>剪辑</option><option>拍摄</option><option>采访</option><option>分镜</option><option>阅读输入</option><option>复盘</option><option>健身</option><option>其他</option></select><div class="formLabel">分钟</div><input id="manualMinutes" type="number" min="1" max="900" value="60"><div class="formLabel">推进了什么</div><textarea id="manualDone"></textarea><div class="actionRow"><button class="secondary close">取消</button><button id="saveManual" class="primary">保存</button></div></div></div>
+<div id="reviewModal" class="modal"><div class="sheet"><div class="sectionTitle">本周复盘</div><div class="formLabel">这周我做成了什么？</div><textarea id="weekDone"></textarea><div class="formLabel">下周最重要的一个作品增量</div><textarea id="nextWeekGoal"></textarea><div class="actionRow"><button class="secondary close">取消</button><button id="saveReview" class="primary">保存</button></div></div></div>
+<div id="toast" class="toast">已保存</div>
+<script src="./app.js?v=3"></script>
+</body>
+</html>
