@@ -16,6 +16,8 @@ npm run check
 - V2 按“项目 → 计时 → 记录 → 周统计 → 周复盘”纵向闭环开发；
 - 每次发布必须通过 `docs/02_delivery-and-qa-gates.md`。
 
+独立预览：https://bluebluegogo5134-spec.github.io/creative-planet-v2-preview/
+
 ## 核心口径
 
 - 创作节点按实际创作日计算：同一自然日最多 1 个；
