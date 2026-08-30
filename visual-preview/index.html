@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fff8e9" />
+    <title>创作星球｜五板块设计效果稿</title>
+    <link rel="stylesheet" href="./styles.css?v=5" />
+  </head>
+  <body>
+    <main class="review-stage">
+      <section class="phone" aria-label="创作星球五板块交互预览">
+        <div class="screens">
+          <section class="screen active" data-screen="home">
+            <header class="hero hero-home">
+              <span class="preview-badge">效果稿 · 可点击</span>
+              <div class="hero-copy home-copy">
+                <p>创作星球</p>
+                <h1 class="home-title" aria-label="慢一点也没关系，但不要离自己的星球太远">
+                  <span class="title-first"><em>慢一点</em><small>，也没关系</small></span>
+                  <span class="title-second">但不要离</span>
+                  <span class="title-third"><strong>自己的星球</strong><small>太远</small></span>
+                </h1>
+              </div>
+            </header>
+            <div class="screen-stack home-stack">
+              <article class="card rhythm-card">
+                <div class="card-heading"><div><p class="eyebrow">本周创作节律</p><h2>守住四次连接</h2></div><span class="soft-status">正在发光</span></div>
+                <div class="rhythm-row"><div><strong>5<span>/4</span></strong><small>创作节点</small></div><div><strong>14.5<span>h</span></strong><small>累计时长</small></div><div><strong>2<span>次</span></strong><small>健身</small></div></div>
+                <div class="progress"><i></i></div><p class="extra-star">✦ 本周又多点亮了 1 颗星</p>
+              </article>
+              <article class="card project-card">
+                <div class="project-copy"><p class="eyebrow">正在推进</p><h2>江西县城相亲角</h2><p class="next">下一步：写完“进入相亲角”第一稿</p></div>
+                <button class="primary-pill" type="button" data-toast="进入本次创作连接"><span>✦</span>开始创作</button>
+              </article>
+              <article class="card week-card">
+                <div class="card-heading week-heading"><div><p class="eyebrow">这一周</p><h2>给重要的事留出位置</h2></div><button class="text-action" type="button" data-go="plan">调整</button></div>
+                <div class="week-grid compact-week">
+                  <button class="day creative"><b>一</b><span>✎</span><small>创作</small></button><button class="day fitness"><b>二</b><span>○</span><small>健身</small></button><button class="day creative"><b>三</b><span>✎</span><small>创作</small></button><button class="day fitness"><b>四</b><span>○</span><small>健身</small></button><button class="day free"><b>五</b><span>✦</span><small>自由</small></button><button class="day creative long"><b>六</b><span>✎</span><small>创作</small></button><button class="day creative long"><b>日</b><span>✎</span><small>创作</small></button>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="projects">
+            <header class="hero hero-projects"><div class="section-hero-copy light-copy"><p>每个项目，都是一颗星球</p><h1>我的项目</h1><small>让想法有名字，也有下一步</small></div></header>
+            <div class="screen-stack">
+              <div class="section-actions"><p><strong>3</strong> 颗正在生长的星球</p><button class="new-project" type="button" data-expand="new-project-form">＋ 新建项目</button></div>
+              <article class="card new-project-form" id="new-project-form" hidden>
+                <p class="eyebrow">种下一颗新星球</p><input aria-label="项目名称" placeholder="项目名称" /><textarea aria-label="项目介绍" placeholder="它想讲什么？为什么现在要做？"></textarea><button class="wide-button" data-toast="预览：项目已创建">确认创建</button>
+              </article>
+              <article class="card world-card current-world">
+                <div class="planet-mark coral">✦</div><div class="world-copy"><p class="eyebrow">本周在轨 · 进行中</p><h2>江西县城相亲角</h2><p>非虚构写作 · 下一步：完成第一幕</p><div class="world-progress"><i style="width:62%"></i></div></div><button class="more" data-menu="world-menu-1">•••</button>
+                <div class="fold-menu" id="world-menu-1" hidden><button>编辑</button><button>归档</button><button class="danger">删除</button></div>
+              </article>
+              <article class="card world-card"><div class="planet-mark gold">○</div><div class="world-copy"><p class="eyebrow">缓慢生长 · 构思中</p><h2>母亲的河流</h2><p>影像计划 · 素材整理 28%</p></div><button class="more" data-menu="world-menu-2">•••</button><div class="fold-menu" id="world-menu-2" hidden><button>编辑</button><button>归档</button><button class="danger">删除</button></div></article>
+              <article class="card world-card"><div class="planet-mark green">✿</div><div class="world-copy"><p class="eyebrow">等待靠近 · 暂停</p><h2>小城人物志</h2><p>采访计划 · 等待下一次出发</p></div><button class="more" data-menu="world-menu-3">•••</button><div class="fold-menu" id="world-menu-3" hidden><button>编辑</button><button>归档</button><button class="danger">删除</button></div></article>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="connect">
+            <header class="hero hero-connect"><div class="section-hero-copy light-copy"><p>与作品连接，也与身体连接</p><h1>建立连接</h1><small>今天愿意靠近一点，就已经很好</small></div></header>
+            <div class="screen-stack">
+              <div class="mode-switch"><button class="active" data-mode="creative">✎ 创作连接</button><button data-mode="gym">○ 健身打卡</button></div>
+              <div class="connection-panel active" data-panel="creative">
+                <article class="card focus-card"><span class="orbit-ring"><i>✦</i></span><p class="eyebrow">连接到</p><h2>江西县城相亲角</h2><div class="timer">01:00:00</div><p class="gentle-note">先守住这一小时，不要求一次完成整颗星球。</p><button class="wide-button" data-toast="专注已开始，星球计时中">开始专注</button></article>
+                <button class="quiet-link" data-toast="打开补记表单">＋ 补记一次已经发生的创作</button>
+              </div>
+              <div class="connection-panel" data-panel="gym">
+                <article class="card gym-card"><div class="gym-planet"><span>○</span><i>✦</i></div><p class="eyebrow">照顾承载创作的身体</p><h2>今天动过，就值得记录</h2><p>不设门槛，一键完成；时长、类型和感受都可以之后再补。</p><button class="wide-button gym-checkin" data-toast="健身已打卡，今天也照顾了身体">完成健身，点亮今天</button><button class="detail-toggle" data-expand="gym-details">填写可选详情⌄</button><div class="gym-details" id="gym-details" hidden><select><option>散步</option><option>力量训练</option><option>跑步</option><option>瑜伽</option></select><select><option>不记录时长</option><option>30 分钟</option><option>60 分钟</option></select><textarea placeholder="身体现在是什么感觉？"></textarea></div></article>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="plan">
+            <header class="hero hero-plan"><div class="plan-stars" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i></div><div class="section-hero-copy"><p>计划是边界，不是考勤</p><h1>本周计划</h1><small>先决定哪几天靠近创作</small></div></header>
+            <div class="screen-stack">
+              <article class="card calendar-card"><div class="card-heading"><div><p class="eyebrow">8月24日—30日</p><h2>选择每一天的节律</h2></div><span class="soft-status">自动保存</span></div><div class="week-grid plan-grid">
+                <button class="day creative selected"><b>一</b><span>✎</span><small>创作</small></button><button class="day fitness"><b>二</b><span>○</span><small>健身</small></button><button class="day creative"><b>三</b><span>✎</span><small>创作</small></button><button class="day fitness"><b>四</b><span>○</span><small>健身</small></button><button class="day free"><b>五</b><span>✦</span><small>自由</small></button><button class="day creative long"><b>六</b><span>✎</span><small>长创作</small></button><button class="day creative long"><b>日</b><span>✎</span><small>长创作</small></button>
+              </div></article>
+              <article class="card day-editor"><p class="eyebrow">周一 · 创作连接日</p><h2>准备在哪个时段靠近？</h2><div class="choice-row"><button class="selected">上午</button><button>下午</button><button>晚上</button></div><p class="preset-note">✦ 周中默认专注 1 小时</p></article>
+              <article class="card weekend-note"><span>☀</span><div><p class="eyebrow">周末长连接</p><h2>一天半 · 目标 12 小时</h2><p>只守住总量，不切碎成僵硬的时间点。</p></div></article>
+            </div>
+          </section>
+
+          <section class="screen" data-screen="review">
+            <header class="hero hero-review"><div class="section-hero-copy light-copy"><p>回头看见走过的星光</p><h1>本周复盘</h1><small>不是评分，是重新辨认方向</small></div></header>
+            <div class="screen-stack">
+              <article class="card review-summary"><p class="eyebrow">这一周留下的光</p><div class="review-numbers"><div><strong>5<small>/4</small></strong><span>创作节点</span></div><div><strong>14.5<small>h</small></strong><span>创作时长</span></div><div><strong>2<small>次</small></strong><span>健身</span></div></div><p class="extra-star center">✦ 计划之外，你又主动靠近了 1 次</p></article>
+              <article class="card star-path"><div class="path-line"><i></i><i></i><i></i><i></i><i></i></div><div class="card-heading"><div><p class="eyebrow">项目轨迹</p><h2>江西县城相亲角</h2></div><strong>12h</strong></div><p>本周完成了第一幕，从“想写”走到了“已有形状”。</p></article>
+              <article class="card reflection-card"><label><span>这周，哪一次连接最重要？</span><textarea placeholder="写下那一刻……"></textarea></label><label><span>下周，只想守住什么？</span><textarea placeholder="不用很多，一件就好……"></textarea></label><button class="wide-button" data-toast="复盘已保存，星光会留在这里">收好这一周</button></article>
+            </div>
+          </section>
+        </div>
+
+        <nav class="bottom-nav" aria-label="主要导航">
+          <button class="active" data-go="home"><span>⌂</span><small>首页</small></button><button data-go="projects"><span>◉</span><small>项目</small></button><button class="nav-create" data-go="connect"><span>✦</span><small>建立连接</small></button><button data-go="plan"><span>☷</span><small>计划</small></button><button data-go="review"><span>✦</span><small>复盘</small></button>
+        </nav>
+        <div class="toast" role="status" aria-live="polite"></div>
+      </section>
+
+      <aside class="review-notes">
+        <p class="notes-label">CREATIVE PLANET · FIVE WORLDS</p><h2 id="notes-title">首页 · 照料</h2><p id="notes-copy">小王子给玫瑰浇水，把创作定义成长期照料；首屏直接看见本周节律、当前项目与七天安排。</p>
+        <dl><div><dt>统一</dt><dd>暖奶油、落日金、珊瑚红、橄榄绿；同一位小王子和同一套手绘质感。</dd></div><div><dt>区分</dt><dd>五页 Hero 各讲一个动作：照料、经营、靠近、安排、回望。</dd></div><div><dt>交互</dt><dd>关键动作直接出现，管理操作折叠；装饰只在帮助理解功能时出现。</dd></div></dl>
+        <p class="review-tip">请点击底部五个板块逐页查看；按钮、菜单、连接模式与详情折叠均可交互。</p>
+      </aside>
+    </main>
+    <script src="./preview.js?v=5"></script>
+  </body>
+</html>
