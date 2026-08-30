@@ -213,33 +213,38 @@ function Metric({ label, value, progress, tone = 'blue' }: { label: string; valu
 function ProjectsPage() {
   const projects = useAppStore((state) => state.projects)
   const sessions = useAppStore((state) => state.sessions)
-  const currentProjectId = useAppStore((state) => state.currentProjectId)
   const addProject = useAppStore((state) => state.addProject)
-  const setCurrentProject = useAppStore((state) => state.setCurrentProject)
   const updateProject = useAppStore((state) => state.updateProject)
   const archiveProject = useAppStore((state) => state.archiveProject)
   const deleteProject = useAppStore((state) => state.deleteProject)
+  const [creating, setCreating] = useState(false)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
 
   async function createProject() {
+    if (!name.trim()) return
     await addProject(name, description)
     setName('')
     setDescription('')
+    setCreating(false)
   }
 
   return (
     <PageFrame eyebrow="把每一个想法，孕育成一颗星球" title="项目星系" image="hero1.jpg">
-      <article className="card create-project-form">
+      <div className="project-page-heading">
+        <div><p className="eyebrow">你的创作星系</p><h2>已建立项目</h2><small>{projects.filter((project) => project.status === 'active').length} 个进行中 · {projects.filter((project) => project.status === 'archived').length} 个已归档</small></div>
+        <button className="small-add-project" type="button" aria-expanded={creating} onClick={() => setCreating((value) => !value)}>{creating ? '收起' : '＋ 新建项目'}</button>
+      </div>
+      {creating && <article className="card create-project-form">
         <div><p className="eyebrow">孕育一颗新星球</p><h2>新建项目</h2></div>
         <label htmlFor="new-project">项目名称<input id="new-project" value={name} onChange={(event) => setName(event.target.value)} placeholder="例如：县城就业" /></label>
         <label htmlFor="new-project-description">项目简介<textarea id="new-project-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="这个项目想记录什么、回应什么问题？" /></label>
-        <button className="primary-button" type="button" onClick={() => void createProject()}>创建项目</button>
-      </article>
+        <div className="button-row"><button className="secondary-button" type="button" onClick={() => setCreating(false)}>取消</button><button className="primary-button" type="button" onClick={() => void createProject()}>创建项目</button></div>
+      </article>}
       <div className="project-list">
-        {projects.filter((project) => project.status === 'active').map((project) => {
+        {[...projects].sort((a, b) => Number(a.status === 'archived') - Number(b.status === 'archived') || b.updatedAt - a.updatedAt).map((project) => {
           const minutes = sessions.filter((session) => session.projectId === project.id).reduce((sum, session) => sum + session.durationMinutes, 0)
-          return <ProjectCard key={project.id} project={project} minutes={minutes} current={project.id === currentProjectId} select={() => void setCurrentProject(project.id)} save={updateProject} archive={archiveProject} remove={deleteProject} />
+          return <ProjectCard key={project.id} project={project} minutes={minutes} save={updateProject} archive={archiveProject} remove={deleteProject} />
         })}
       </div>
       <DataSafetyCard />
@@ -247,7 +252,7 @@ function ProjectsPage() {
   )
 }
 
-function ProjectCard({ project, minutes, current, select, save, archive, remove }: { project: Project; minutes: number; current: boolean; select: () => void; save: (project: Project) => Promise<void>; archive: (id: string) => Promise<void>; remove: (id: string) => Promise<void> }) {
+function ProjectCard({ project, minutes, save, archive, remove }: { project: Project; minutes: number; save: (project: Project) => Promise<void>; archive: (id: string) => Promise<void>; remove: (id: string) => Promise<void> }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(project)
 
@@ -257,7 +262,7 @@ function ProjectCard({ project, minutes, current, select, save, archive, remove 
   }
 
   return (
-    <article className={`card project-card ${current ? 'current' : ''}`}>
+    <article className={`card project-card ${project.status === 'archived' ? 'archived' : ''}`}>
       {editing ? (
         <div className="edit-project-grid">
           <label>项目名<input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
@@ -269,17 +274,19 @@ function ProjectCard({ project, minutes, current, select, save, archive, remove 
       ) : (
         <>
           <div className="section-heading compact">
-            <div><h2>{project.name}</h2><span className="tag">{project.stage}</span></div>
+            <div><h2>{project.name}</h2><div className="project-status-row"><span className="tag">{project.stage}</span><span className={`project-status ${project.status}`}>{project.status === 'active' ? '进行中' : '已归档'}</span></div></div>
             <span className="project-hours">{formatMinutes(minutes)}</span>
           </div>
           {project.description && <p className="project-description">{project.description}</p>}
           <p className="next-action">下一步：{project.nextAction}</p>
-          <div className="project-action-grid">
-            <button className="secondary-button" type="button" onClick={() => { setDraft(project); setEditing(true) }}>编辑</button>
-            <button className={current ? 'quiet-button' : 'primary-button'} type="button" disabled={current} onClick={select}>{current ? '当前项目' : '设为当前'}</button>
-            <button className="archive-button" type="button" onClick={() => { if (window.confirm(`将“${project.name}”移入归档？历史记录会保留。`)) void archive(project.id) }}>归档</button>
-            <button className="danger-button" type="button" onClick={() => { if (window.confirm(`永久删除“${project.name}”？历史创作记录会保留，但之后不再显示这个项目名。`)) void remove(project.id) }}>删除项目</button>
-          </div>
+          <details className="project-menu">
+            <summary>项目管理 <span aria-hidden="true">•••</span></summary>
+            <div className="project-action-grid">
+              <button className="secondary-button" type="button" onClick={() => { setDraft(project); setEditing(true) }}>编辑项目</button>
+              {project.status === 'active' ? <button className="archive-button" type="button" onClick={() => { if (window.confirm(`将“${project.name}”移入归档？历史记录会保留。`)) void archive(project.id) }}>归档项目</button> : <button className="secondary-button" type="button" onClick={() => void save({ ...project, status: 'active' })}>恢复项目</button>}
+              <button className="danger-button project-delete-action" type="button" onClick={() => { if (window.confirm(`永久删除“${project.name}”？历史创作记录会保留，但之后不再显示这个项目名。`)) void remove(project.id) }}>删除项目</button>
+            </div>
+          </details>
         </>
       )}
     </article>
@@ -339,6 +346,7 @@ function SessionPage() {
   const [showFinish, setShowFinish] = useState(false)
   const [showManual, setShowManual] = useState(false)
   const [editingSession, setEditingSession] = useState<CreativeSession | null>(null)
+  const [sessionNotice, setSessionNotice] = useState('')
   const [tick, setTick] = useState(Date.now())
 
   useEffect(() => {
@@ -370,13 +378,21 @@ function SessionPage() {
             <div className="timer-display active">{formatElapsed(getElapsedMs(activeTimer, tick))}</div>
             <div className="button-row">
               {activeTimer.status === 'running' ? <button className="secondary-button" type="button" onClick={() => void pauseTimer()}>暂停</button> : <button className="primary-button" type="button" onClick={() => void resumeTimer()}>恢复</button>}
-              <button className="primary-button" type="button" onClick={() => setShowFinish(true)}>结束并记录</button>
+              <button className="primary-button" type="button" onClick={() => { setSessionNotice(''); setShowFinish(true) }}>结束并记录</button>
             </div>
           </>
         )}
       </article>
 
-      {showFinish && activeTimer.status !== 'idle' && <FinishPanel close={() => setShowFinish(false)} save={async (input) => { await finishTimer(input); setShowFinish(false); setGoal('') }} />}
+      {sessionNotice && <p className="session-notice" role="status">{sessionNotice}</p>}
+      {showFinish && activeTimer.status !== 'idle' && <FinishPanel close={() => setShowFinish(false)} save={async (input) => {
+        await finishTimer(input)
+        if (useAppStore.getState().activeTimer.status === 'idle') {
+          setShowFinish(false)
+          setGoal('')
+          setSessionNotice('这次创作已经记录下来。')
+        }
+      }} />}
       {showManual && <ManualPanel projects={projects} close={() => setShowManual(false)} save={async (input) => { await addManualSession(input); setShowManual(false) }} />}
       {editingSession && <EditSessionPanel session={editingSession} projects={projects} close={() => setEditingSession(null)} save={async (input) => { await updateSession(editingSession.id, input); setEditingSession(null) }} />}
 
@@ -397,13 +413,27 @@ function FinishPanel({ close, save }: { close: () => void; save: (input: { done:
   const [done, setDone] = useState('')
   const [nextAction, setNextAction] = useState('')
   const [mood, setMood] = useState('慢慢进去了')
+  const [saving, setSaving] = useState(false)
+  const panelRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    window.requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+  }, [])
+
+  async function submit() {
+    if (saving) return
+    setSaving(true)
+    await save({ done, nextAction, mood })
+    setSaving(false)
+  }
+
   return (
-    <article className="card finish-panel">
+    <article ref={panelRef} className="card finish-panel" tabIndex={-1}>
       <h2>结束这次创作</h2>
       <label>这次推进了什么？<textarea value={done} onChange={(event) => setDone(event.target.value)} /></label>
       <label>下一次从哪里继续？<textarea value={nextAction} onChange={(event) => setNextAction(event.target.value)} /></label>
       <fieldset><legend>进入状态怎么样？</legend><div className="mood-row">{['很难进去', '慢慢进去了', '很沉浸'].map((item) => <button key={item} type="button" className={mood === item ? 'selected' : ''} onClick={() => setMood(item)}>{item}</button>)}</div></fieldset>
-      <div className="button-row"><button className="secondary-button" type="button" onClick={close}>返回</button><button className="primary-button" type="button" onClick={() => void save({ done, nextAction, mood })}>保存记录</button></div>
+      <div className="button-row"><button className="secondary-button" type="button" disabled={saving} onClick={close}>返回</button><button className="primary-button" type="button" disabled={saving} onClick={() => void submit()}>{saving ? '正在保存…' : '保存记录'}</button></div>
     </article>
   )
 }

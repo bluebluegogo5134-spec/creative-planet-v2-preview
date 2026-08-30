@@ -85,4 +85,23 @@ describe('session record workflow', () => {
     const saturday = await db.weekPlans.get(plan[5].id)
     expect(saturday?.periods).toEqual(['上午', '下午'])
   })
+
+  it('finishes an active timer and creates a visible session record', async () => {
+    const projectId = useAppStore.getState().currentProjectId
+    await useAppStore.getState().startTimer(projectId, '写作', '完成一小段')
+
+    await useAppStore.getState().finishTimer({
+      done: '完成测试记录',
+      nextAction: '继续下一段',
+      mood: '慢慢进去了'
+    })
+
+    expect(useAppStore.getState().activeTimer.status).toBe('idle')
+    expect(useAppStore.getState().sessions[0]).toMatchObject({
+      projectId,
+      type: '写作',
+      done: '完成测试记录',
+      nextAction: '继续下一段'
+    })
+  })
 })

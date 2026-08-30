@@ -91,14 +91,28 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .two-column-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
 .project-list, .plan-list { display: grid; gap: 10px; }
+.project-page-heading { min-height: 58px; padding: 2px 3px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.project-page-heading h2 { margin: 0 0 3px; font-size: 20px; }
+.project-page-heading small { color: var(--muted); font-size: 10px; }
+.small-add-project { flex: none; min-height: 38px; padding: 7px 10px; border: 1px solid #bfcbe3; border-radius: 12px; color: #5d75ad; background: rgba(255, 255, 255, .82); font-size: 10px; font-weight: 700; }
 .create-project-form { display: grid; gap: 10px; }
 .create-project-form h2 { margin: 0; }
-.project-card.current { border-color: #bbc7e8; box-shadow: 0 8px 26px rgba(92, 113, 176, .12); }
+.project-card.archived { background: rgba(247, 248, 249, .94); box-shadow: none; }
 .project-hours { color: var(--muted); font-size: 12px; font-weight: 700; }
 .tag { display: inline-block; margin-top: 4px; padding: 3px 7px; border-radius: 999px; color: #6e71a7; background: #eff0fc; font-size: 9px; }
+.project-status-row { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+.project-status { margin-top: 4px; padding: 3px 7px; border-radius: 999px; font-size: 9px; }
+.project-status.active { color: #4f856d; background: #edf7f1; }
+.project-status.archived { color: #7d8792; background: #edf0f2; }
 .edit-project-grid { display: grid; gap: 9px; }
 .project-description { margin: 10px 0 0; color: var(--ink); font-size: 11px; line-height: 1.58; }
 .project-action-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.project-menu { border-top: 1px dashed var(--line); }
+.project-menu summary { min-height: 44px; padding: 8px 2px 0; display: flex; align-items: center; justify-content: space-between; color: #647eb7; cursor: pointer; font-size: 11px; font-weight: 700; list-style: none; }
+.project-menu summary::-webkit-details-marker { display: none; }
+.project-menu summary span { color: var(--muted); font-size: 14px; letter-spacing: .08em; }
+.project-menu[open] summary { margin-bottom: 7px; }
+.project-delete-action { grid-column: 1 / -1; }
 .data-card { display: grid; gap: 11px; }
 .file-button { display: grid; place-items: center; border: 0; color: #fff; background: linear-gradient(135deg, var(--violet), var(--blue)); cursor: pointer; font-size: 13px; }
 .file-button input { position: absolute; width: 1px; height: 1px; min-height: 0; opacity: 0; pointer-events: none; }
@@ -112,6 +126,7 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .active-session-copy h2 { margin: 4px 0; font-size: 21px; }
 .active-session-copy p { margin: 0; color: var(--muted); font-size: 12px; }
 .finish-panel { display: grid; gap: 10px; border-color: #c8d4ec; background: #fafaff; }
+.session-notice { margin: 0; padding: 10px 12px; border: 1px solid #b8d6c6; border-radius: 13px; color: #4f806b; background: #eff8f3; font-size: 11px; }
 .finish-panel fieldset { margin: 0; padding: 0; border: 0; }
 .finish-panel legend { margin-bottom: 6px; color: var(--muted); font-size: 12px; }
 .mood-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
