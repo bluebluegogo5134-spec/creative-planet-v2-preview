@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#e9f0f8" />
+    <title>创作星球｜首页视觉稿 V1</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="review-stage">
+      <section class="phone" aria-label="创作星球首页视觉预览">
+        <div class="app-scroll">
+          <header class="hero">
+            <span class="preview-badge">视觉稿 V1</span>
+            <div class="hero-copy">
+              <p>CREATIVE PLANET</p>
+              <h1>在自己的星球上，<br />慢慢照料热爱</h1>
+            </div>
+          </header>
+
+          <div class="home-stack">
+            <article class="card rhythm-card">
+              <div class="card-heading">
+                <div><p class="eyebrow">本周创作节律</p><h2>守住四次连接</h2></div>
+                <span class="soft-status">进行中</span>
+              </div>
+              <div class="rhythm-row">
+                <div><strong>2<span>/4</span></strong><small>创作节点</small></div>
+                <div><strong>3.5<span>h</span></strong><small>累计时长</small></div>
+                <div><strong>1<span>次</span></strong><small>健身</small></div>
+              </div>
+              <div class="progress"><i></i></div>
+            </article>
+
+            <article class="card project-card">
+              <div class="project-copy">
+                <p class="eyebrow">正在推进</p>
+                <h2>江西县城相亲角</h2>
+                <p class="next">下一步：写完“进入相亲角”第一稿</p>
+              </div>
+              <button class="create-orbit" type="button" data-toast="预览：进入本次创作">
+                <span>✦</span>
+                开始创作
+              </button>
+            </article>
+
+            <article class="card week-card">
+              <div class="card-heading week-heading">
+                <div><p class="eyebrow">这一周</p><h2>给创作留出位置</h2></div>
+                <button class="text-action" type="button" data-toast="预览：打开周计划">调整</button>
+              </div>
+              <div class="week-grid">
+                <button class="day creative" type="button"><b>一</b><span>🪶</span><small>创作</small></button>
+                <button class="day fitness" type="button"><b>二</b><span>○</span><small>健身</small></button>
+                <button class="day creative" type="button"><b>三</b><span>🪶</span><small>创作</small></button>
+                <button class="day fitness" type="button"><b>四</b><span>○</span><small>健身</small></button>
+                <button class="day free" type="button"><b>五</b><span>✦</span><small>自由</small></button>
+                <button class="day creative long" type="button"><b>六</b><span>🪶</span><small>创作</small></button>
+                <button class="day creative long" type="button"><b>日</b><span>🪶</span><small>创作</small></button>
+              </div>
+            </article>
+
+            <article class="card recent-card">
+              <div class="card-heading"><div><p class="eyebrow">最近记录</p><h2>今天向前走了一点</h2></div><button class="text-action" type="button">查看</button></div>
+              <p>写作 · 江西县城相亲角 <strong>45m</strong></p>
+            </article>
+          </div>
+        </div>
+
+        <nav class="bottom-nav" aria-label="主要导航">
+          <button class="active" type="button"><span>⌂</span><small>首页</small></button>
+          <button type="button"><span>◉</span><small>项目</small></button>
+          <button class="nav-create" type="button"><span>＋</span><small>记录</small></button>
+          <button type="button"><span>☷</span><small>计划</small></button>
+          <button type="button"><span>✦</span><small>复盘</small></button>
+        </nav>
+        <div class="toast" role="status" aria-live="polite"></div>
+      </section>
+
+      <aside class="review-notes">
+        <p class="notes-label">CREATIVE PLANET · VISUAL DIRECTION 01</p>
+        <h2>有场景，但克制</h2>
+        <p>首页首屏优先保护三个信息：本周进度、正在推进的项目、周一至周日安排。删除“上次离开时”，让周计划在首屏完整出现。</p>
+        <dl>
+          <div><dt>Hero</dt><dd>孤独而浪漫的小星球叙事，人物偏右，文字留在安静区域。</dd></div>
+          <div><dt>卡片</dt><dd>更轻的纸张感、细边框和低阴影，不再每块都像独立大模块。</dd></div>
+          <div><dt>按钮</dt><dd>主操作使用单一星云蓝紫；次操作弱化；危险操作只在管理菜单出现。</dd></div>
+          <div><dt>首屏</dt><dd>以390×844的主屏幕PWA为验收基准，七天计划无需下滑。</dd></div>
+        </dl>
+        <p class="review-tip">请重点确认：Hero画面、首屏密度、卡片感觉、主按钮和底部导航。</p>
+      </aside>
+    </main>
+    <script src="./preview.js"></script>
+  </body>
+</html>
