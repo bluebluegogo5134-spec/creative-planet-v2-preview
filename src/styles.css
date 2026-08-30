@@ -76,7 +76,7 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .day-chip.done { border-color: #b9c3e8; background: #f1f2ff; }
 .empty-copy, .page-intro { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 
-.primary-button, .secondary-button, .quiet-button, .text-button, .edit-button, .delete-button, .archive-button, .file-button { min-height: 44px; border-radius: 12px; padding: 9px 13px; font-weight: 700; }
+.primary-button, .secondary-button, .quiet-button, .text-button, .edit-button, .delete-button, .archive-button, .danger-button, .file-button { min-height: 44px; border-radius: 12px; padding: 9px 13px; font-weight: 700; }
 .primary-button { border: 0; color: #fff; background: linear-gradient(135deg, var(--violet), var(--blue)); box-shadow: 0 5px 14px rgba(91, 119, 191, .18); }
 .secondary-button { border: 1px solid var(--line); color: var(--ink); background: #fff; }
 .quiet-button { border: 1px solid #c8d4e2; color: var(--muted); background: #f5f8fa; }
@@ -84,16 +84,21 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .delete-button { min-height: 36px; padding: 5px 8px; border: 0; color: #a36e76; background: transparent; font-size: 10px; }
 .edit-button { min-height: 36px; padding: 5px 8px; border: 0; color: #647eb7; background: transparent; font-size: 10px; }
 .archive-button { border: 1px solid #ead7d9; color: #9c6970; background: #fff9f9; }
+.danger-button { border: 1px solid #e8c8cc; color: #a35560; background: #fff4f5; }
 .button-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .three-button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .inline-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 6px; }
 .two-column-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
 .project-list, .plan-list { display: grid; gap: 10px; }
+.create-project-form { display: grid; gap: 10px; }
+.create-project-form h2 { margin: 0; }
 .project-card.current { border-color: #bbc7e8; box-shadow: 0 8px 26px rgba(92, 113, 176, .12); }
 .project-hours { color: var(--muted); font-size: 12px; font-weight: 700; }
 .tag { display: inline-block; margin-top: 4px; padding: 3px 7px; border-radius: 999px; color: #6e71a7; background: #eff0fc; font-size: 9px; }
 .edit-project-grid { display: grid; gap: 9px; }
+.project-description { margin: 10px 0 0; color: var(--ink); font-size: 11px; line-height: 1.58; }
+.project-action-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 .data-card { display: grid; gap: 11px; }
 .file-button { display: grid; place-items: center; border: 0; color: #fff; background: linear-gradient(135deg, var(--violet), var(--blue)); cursor: pointer; font-size: 13px; }
 .file-button input { position: absolute; width: 1px; height: 1px; min-height: 0; opacity: 0; pointer-events: none; }
@@ -122,14 +127,26 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .session-line small { display: block; margin-top: 2px; overflow: hidden; color: var(--muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
 .session-line strong { font-size: 11px; white-space: nowrap; }
 
-.plan-item { display: grid; gap: 9px; }
-.plan-item small { color: var(--muted); font-size: 9px; }
-.plan-form-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
-.plan-form-grid > label { min-width: 0; }
-.plan-form-grid input, .plan-form-grid select { min-width: 0; max-width: 100%; }
-.small-button { min-height: 38px; padding: 6px 11px; font-size: 11px; }
-.checkbox-line { display: flex; grid-template-columns: none; align-items: center; gap: 8px; color: var(--ink); }
-.checkbox-line input { width: 20px; min-height: 20px; margin: 0; }
+.weekly-goal-card h2 { margin: 0 0 7px; font-size: 18px; }
+.weekly-goal-card > p:last-child { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.58; }
+.weekly-planner { display: grid; gap: 14px; }
+.week-calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.calendar-day { min-width: 0; min-height: 78px; padding: 6px 1px; display: grid; justify-items: center; align-content: center; gap: 3px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: #fff; }
+.calendar-day b { font-size: 10px; }
+.calendar-day span { font-size: 17px; }
+.calendar-day small { width: 100%; overflow: hidden; color: var(--muted); font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-day.selected { border-color: #9eaddf; background: #f0f2ff; box-shadow: 0 4px 12px rgba(91, 107, 174, .12); }
+.day-plan-editor { display: grid; gap: 13px; padding-top: 13px; border-top: 1px dashed var(--line); }
+.day-plan-editor h2 { margin: 0; font-size: 20px; }
+.day-plan-editor fieldset { margin: 0; padding: 0; border: 0; }
+.day-plan-editor legend { margin-bottom: 7px; color: var(--muted); font-size: 11px; }
+.plan-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.plan-choice-grid button, .period-choice-grid button { min-height: 44px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: #fff; font-size: 11px; font-weight: 700; }
+.plan-choice-grid button span { margin-right: 5px; font-size: 16px; }
+.plan-choice-grid button.selected, .period-choice-grid button.selected { border-color: #9eaddf; color: #596ca9; background: #eef1ff; }
+.period-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.plan-hint { margin: 0; padding: 9px 10px; border-radius: 11px; color: var(--muted); background: #f5f8fb; font-size: 10px; line-height: 1.5; }
+.save-week-button { width: 100%; }
 
 .review-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .breakdown-card h2 { margin-bottom: 8px; font-size: 16px; }

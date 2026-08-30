@@ -52,10 +52,11 @@ interface AppStore {
   currentProjectId: string
   activeTimer: TimerState
   init: () => Promise<void>
-  addProject: (name: string) => Promise<void>
+  addProject: (name: string, description: string) => Promise<void>
   setCurrentProject: (id: string) => Promise<void>
   updateProject: (project: Project) => Promise<void>
   archiveProject: (id: string) => Promise<void>
+  deleteProject: (id: string) => Promise<void>
   startTimer: (projectId: string, type: CreativeType, goal: string) => Promise<void>
   pauseTimer: () => Promise<void>
   resumeTimer: () => Promise<void>
@@ -63,7 +64,7 @@ interface AppStore {
   addManualSession: (input: ManualSessionInput) => Promise<void>
   updateSession: (id: string, input: UpdateSessionInput) => Promise<void>
   deleteSession: (id: string) => Promise<void>
-  updatePlanItem: (item: WeekPlanItem) => Promise<void>
+  saveWeekPlan: (items: WeekPlanItem[]) => Promise<void>
   saveReview: (done: string, nextWeekGoal: string) => Promise<void>
 }
 
@@ -150,7 +151,7 @@ export const useAppStore = create<AppStore>((set, get) => {
       }
     },
 
-    addProject: async (name) =>
+    addProject: async (name, description) =>
       run(async () => {
         const trimmed = name.trim()
         if (!trimmed) throw new Error('请先写下项目名称')
@@ -158,6 +159,7 @@ export const useAppStore = create<AppStore>((set, get) => {
         const project: Project = {
           id: newId('project'),
           name: trimmed,
+          description: description.trim(),
           stage: '新项目',
           nextAction: '写下这个项目的下一步',
           status: 'active',
@@ -188,6 +190,27 @@ export const useAppStore = create<AppStore>((set, get) => {
         const activeCount = await db.projects.where('status').equals('active').count()
         if (activeCount <= 1) throw new Error('至少需要保留一个进行中的项目')
         await db.projects.put({ ...project, status: 'archived', updatedAt: Date.now() })
+      }),
+
+    deleteProject: async (id) =>
+      run(async () => {
+        const project = await db.projects.get(id)
+        if (!project) throw new Error('项目不存在')
+        const timer = get().activeTimer
+        if (timer.status !== 'idle' && timer.projectId === id) {
+          throw new Error('这个项目正在计时，请先结束本次创作')
+        }
+        const activeProjects = await db.projects.where('status').equals('active').toArray()
+        if (project.status === 'active' && activeProjects.length <= 1) {
+          throw new Error('至少需要保留一个进行中的项目')
+        }
+        await db.transaction('rw', [db.projects, db.appState], async () => {
+          await db.projects.delete(id)
+          if (get().currentProjectId === id) {
+            const replacement = activeProjects.find((item) => item.id !== id)
+            if (replacement) await saveAppState('currentProjectId', replacement.id)
+          }
+        })
       }),
 
     startTimer: async (projectId, type, goal) =>
@@ -305,9 +328,10 @@ export const useAppStore = create<AppStore>((set, get) => {
         await db.sessions.delete(id)
       }),
 
-    updatePlanItem: async (item) =>
+    saveWeekPlan: async (items) =>
       run(async () => {
-        await db.weekPlans.put({ ...item, updatedAt: Date.now() })
+        const updatedAt = Date.now()
+        await db.weekPlans.bulkPut(items.map((item) => ({ ...item, updatedAt })))
       }),
 
     saveReview: async (done, nextWeekGoal) =>

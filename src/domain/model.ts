@@ -13,11 +13,13 @@ export const CREATIVE_TYPES = [
 export type CreativeType = (typeof CREATIVE_TYPES)[number]
 export type ActivityType = CreativeType | '健身'
 export type PlanType = '创作' | '健身' | '自由' | '休息'
+export type DayPeriod = '上午' | '下午' | '晚上'
 export type ProjectStatus = 'active' | 'archived'
 
 export interface Project {
   id: string
   name: string
+  description?: string
   stage: string
   nextAction: string
   status: ProjectStatus
@@ -63,6 +65,7 @@ export interface WeekPlanItem {
   dayIndex: number
   dayLabel: string
   type: PlanType
+  periods: DayPeriod[]
   start: string
   end: string
   countsAsPlannedNode: boolean

@@ -50,6 +50,7 @@ function migrateProjects(legacy: Record<string, unknown>, now: number): Project[
   return legacy.projects.filter(isRecord).map((project) => ({
     id: text(project.id, id('project')),
     name: text(project.name, '未命名项目'),
+    description: text(project.description),
     stage: text(project.stage, '进行中'),
     nextAction: text(project.next, '写下这个项目的下一步'),
     status: 'active',
@@ -106,6 +107,7 @@ function migrateWeekPlan(
       item.type === '健身' || item.type === '自由' || item.type === '休息'
         ? item.type
         : '创作',
+    periods: [],
     start: text(item.start),
     end: text(item.end),
     countsAsPlannedNode: Boolean(item.node),

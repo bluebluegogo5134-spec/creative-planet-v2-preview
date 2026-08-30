@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { addDaysKey, getWeekStart, toDateKey } from './domain/date'
-import { CREATIVE_TYPES, type CreativeSession, type Project, type WeekPlanItem } from './domain/model'
+import { CREATIVE_TYPES, type CreativeSession, type DayPeriod, type Project, type WeekPlanItem } from './domain/model'
 import { getElapsedMs } from './domain/timer'
 import { summarizeWeek, WEEKLY_MINUTE_GOAL, WEEKLY_NODE_GOAL } from './domain/weekly'
 import { weekDateKey } from './data/defaults'
@@ -16,6 +16,15 @@ const NAV: Array<{ id: Page; icon: string; label: string }> = [
   { id: 'plan', icon: '☷', label: '计划' },
   { id: 'review', icon: '✦', label: '复盘' }
 ]
+
+const PLAN_TYPES: Array<{ value: WeekPlanItem['type']; icon: string; label: string }> = [
+  { value: '创作', icon: '🪶', label: '创作连接' },
+  { value: '健身', icon: '🏋️', label: '健身' },
+  { value: '自由', icon: '⭐', label: '自由' },
+  { value: '休息', icon: '☁️', label: '休息' }
+]
+
+const DAY_PERIODS: DayPeriod[] = ['上午', '下午', '晚上']
 
 function formatMinutes(minutes: number): string {
   if (minutes < 60) return `${Math.round(minutes)}m`
@@ -209,26 +218,28 @@ function ProjectsPage() {
   const setCurrentProject = useAppStore((state) => state.setCurrentProject)
   const updateProject = useAppStore((state) => state.updateProject)
   const archiveProject = useAppStore((state) => state.archiveProject)
+  const deleteProject = useAppStore((state) => state.deleteProject)
   const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
 
   async function createProject() {
-    await addProject(name)
+    await addProject(name, description)
     setName('')
+    setDescription('')
   }
 
   return (
     <PageFrame eyebrow="把每一个想法，孕育成一颗星球" title="项目星系" image="hero1.jpg">
       <article className="card create-project-form">
-        <label htmlFor="new-project">新项目</label>
-        <div className="inline-form">
-          <input id="new-project" value={name} onChange={(event) => setName(event.target.value)} placeholder="例如：县城就业" />
-          <button className="primary-button" type="button" onClick={() => void createProject()}>新建</button>
-        </div>
+        <div><p className="eyebrow">孕育一颗新星球</p><h2>新建项目</h2></div>
+        <label htmlFor="new-project">项目名称<input id="new-project" value={name} onChange={(event) => setName(event.target.value)} placeholder="例如：县城就业" /></label>
+        <label htmlFor="new-project-description">项目简介<textarea id="new-project-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="这个项目想记录什么、回应什么问题？" /></label>
+        <button className="primary-button" type="button" onClick={() => void createProject()}>创建项目</button>
       </article>
       <div className="project-list">
         {projects.filter((project) => project.status === 'active').map((project) => {
           const minutes = sessions.filter((session) => session.projectId === project.id).reduce((sum, session) => sum + session.durationMinutes, 0)
-          return <ProjectCard key={project.id} project={project} minutes={minutes} current={project.id === currentProjectId} select={() => void setCurrentProject(project.id)} save={updateProject} archive={archiveProject} />
+          return <ProjectCard key={project.id} project={project} minutes={minutes} current={project.id === currentProjectId} select={() => void setCurrentProject(project.id)} save={updateProject} archive={archiveProject} remove={deleteProject} />
         })}
       </div>
       <DataSafetyCard />
@@ -236,7 +247,7 @@ function ProjectsPage() {
   )
 }
 
-function ProjectCard({ project, minutes, current, select, save, archive }: { project: Project; minutes: number; current: boolean; select: () => void; save: (project: Project) => Promise<void>; archive: (id: string) => Promise<void> }) {
+function ProjectCard({ project, minutes, current, select, save, archive, remove }: { project: Project; minutes: number; current: boolean; select: () => void; save: (project: Project) => Promise<void>; archive: (id: string) => Promise<void>; remove: (id: string) => Promise<void> }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(project)
 
@@ -250,6 +261,7 @@ function ProjectCard({ project, minutes, current, select, save, archive }: { pro
       {editing ? (
         <div className="edit-project-grid">
           <label>项目名<input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} /></label>
+          <label>项目简介<textarea value={draft.description ?? ''} onChange={(event) => setDraft({ ...draft, description: event.target.value })} placeholder="这个项目想记录什么、回应什么问题？" /></label>
           <label>阶段<input value={draft.stage} onChange={(event) => setDraft({ ...draft, stage: event.target.value })} /></label>
           <label>下一步<textarea value={draft.nextAction} onChange={(event) => setDraft({ ...draft, nextAction: event.target.value })} /></label>
           <div className="button-row"><button className="secondary-button" type="button" onClick={() => setEditing(false)}>取消</button><button className="primary-button" type="button" onClick={() => void submit()}>保存</button></div>
@@ -260,11 +272,13 @@ function ProjectCard({ project, minutes, current, select, save, archive }: { pro
             <div><h2>{project.name}</h2><span className="tag">{project.stage}</span></div>
             <span className="project-hours">{formatMinutes(minutes)}</span>
           </div>
+          {project.description && <p className="project-description">{project.description}</p>}
           <p className="next-action">下一步：{project.nextAction}</p>
-          <div className="three-button-row">
+          <div className="project-action-grid">
             <button className="secondary-button" type="button" onClick={() => { setDraft(project); setEditing(true) }}>编辑</button>
             <button className={current ? 'quiet-button' : 'primary-button'} type="button" disabled={current} onClick={select}>{current ? '当前项目' : '设为当前'}</button>
             <button className="archive-button" type="button" onClick={() => { if (window.confirm(`将“${project.name}”移入归档？历史记录会保留。`)) void archive(project.id) }}>归档</button>
+            <button className="danger-button" type="button" onClick={() => { if (window.confirm(`永久删除“${project.name}”？历史创作记录会保留，但之后不再显示这个项目名。`)) void remove(project.id) }}>删除项目</button>
           </div>
         </>
       )}
@@ -435,32 +449,69 @@ function EditSessionPanel({ session, projects, close, save }: { session: Creativ
   )
 }
 
-function PlanPage() {
-  const plan = useAppStore((state) => state.weekPlan)
-  const updatePlanItem = useAppStore((state) => state.updatePlanItem)
-  return (
-    <PageFrame eyebrow="计划是边界，不是考勤" title="本周计划" image="hero4.jpg">
-      <p className="page-intro">计划完成与实际创作节点分别计算。临时在计划外创作，也会如实计入实际节点。</p>
-      <div className="plan-list">{plan.map((item) => <PlanItem key={item.id} item={item} save={updatePlanItem} />)}</div>
-    </PageFrame>
-  )
+function inferPeriods(item: WeekPlanItem): DayPeriod[] {
+  if (Array.isArray(item.periods)) return item.periods
+  if (!item.start && !item.end) return []
+  const start = Number(item.start.slice(0, 2))
+  const end = Number(item.end.slice(0, 2))
+  const periods: DayPeriod[] = []
+  if (start < 12) periods.push('上午')
+  if (start < 18 && end > 12) periods.push('下午')
+  if (start >= 18 || end > 18) periods.push('晚上')
+  return periods
 }
 
-function PlanItem({ item, save }: { item: WeekPlanItem; save: (item: WeekPlanItem) => Promise<void> }) {
-  const [draft, setDraft] = useState(item)
-  const changed = JSON.stringify(draft) !== JSON.stringify(item)
-  useEffect(() => setDraft(item), [item])
+function normalizePlan(plan: WeekPlanItem[]): WeekPlanItem[] {
+  return plan.map((item) => ({ ...item, periods: inferPeriods(item), countsAsPlannedNode: item.type === '创作' }))
+}
+
+function PlanPage() {
+  const plan = useAppStore((state) => state.weekPlan)
+  const saveWeekPlan = useAppStore((state) => state.saveWeekPlan)
+  const [draft, setDraft] = useState(() => normalizePlan(plan))
+  const [selectedDay, setSelectedDay] = useState(0)
+  const normalized = normalizePlan(plan)
+  const changed = JSON.stringify(draft) !== JSON.stringify(normalized)
+  const selected = draft[selectedDay]
+
+  useEffect(() => setDraft(normalizePlan(plan)), [plan])
+
+  function updateSelected(update: Partial<WeekPlanItem>) {
+    setDraft((items) => items.map((item, index) => index === selectedDay ? { ...item, ...update } : item))
+  }
+
+  function chooseType(type: WeekPlanItem['type']) {
+    updateSelected({ type, countsAsPlannedNode: type === '创作', periods: type === '自由' || type === '休息' ? [] : selected.periods })
+  }
+
+  function togglePeriod(period: DayPeriod) {
+    const periods = selected.periods.includes(period) ? selected.periods.filter((item) => item !== period) : [...selected.periods, period]
+    updateSelected({ periods })
+  }
+
   return (
-    <article className="card plan-item">
-      <div className="section-heading compact"><div><h2>{item.dayLabel}</h2><small>{addDaysKey(item.weekStart, item.dayIndex)}</small></div>{changed && <button className="primary-button small-button" type="button" onClick={() => void save(draft)}>保存</button>}</div>
-      <div className="plan-form-grid">
-        <label>类型<select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as WeekPlanItem['type'] })}>{['创作', '健身', '自由', '休息'].map((type) => <option key={type}>{type}</option>)}</select></label>
-        <label>开始<input type="time" value={draft.start} onChange={(event) => setDraft({ ...draft, start: event.target.value })} /></label>
-        <label>结束<input type="time" value={draft.end} onChange={(event) => setDraft({ ...draft, end: event.target.value })} /></label>
-      </div>
-      <label>备注<input value={draft.note} onChange={(event) => setDraft({ ...draft, note: event.target.value })} /></label>
-      <label className="checkbox-line"><input type="checkbox" checked={draft.countsAsPlannedNode} onChange={(event) => setDraft({ ...draft, countsAsPlannedNode: event.target.checked })} />计划为创作连接</label>
-    </article>
+    <PageFrame eyebrow="计划是边界，不是考勤" title="本周计划" image="hero4.jpg">
+      <article className="card weekly-goal-card">
+        <p className="eyebrow">本周创作边界</p>
+        <h2>工作日 2 次连接 · 周末留出一天半</h2>
+        <p>工作日每次专注 1 小时，周末合计保留 12 小时；临时计划外创作也会如实计入实际节点。</p>
+      </article>
+      <article className="card weekly-planner">
+        <div className="week-calendar" aria-label="选择要设置的日期">
+          {draft.map((item, index) => {
+            const type = PLAN_TYPES.find((option) => option.value === item.type) ?? PLAN_TYPES[0]
+            return <button key={item.id} className={`calendar-day ${selectedDay === index ? 'selected' : ''}`} type="button" onClick={() => setSelectedDay(index)}><b>{item.dayLabel.slice(1)}</b><span>{type.icon}</span><small>{type.label}</small></button>
+          })}
+        </div>
+        {selected && <div className="day-plan-editor">
+          <div><p className="eyebrow">{addDaysKey(selected.weekStart, selected.dayIndex)}</p><h2>设置{selected.dayLabel}</h2></div>
+          <fieldset><legend>这一天是什么日子？</legend><div className="plan-choice-grid">{PLAN_TYPES.map((option) => <button key={option.value} className={selected.type === option.value ? 'selected' : ''} type="button" onClick={() => chooseType(option.value)}><span>{option.icon}</span>{option.label}</button>)}</div></fieldset>
+          {selected.type !== '自由' && selected.type !== '休息' && <fieldset><legend>大概安排在什么时候？可多选</legend><div className="period-choice-grid">{DAY_PERIODS.map((period) => <button key={period} className={selected.periods.includes(period) ? 'selected' : ''} type="button" onClick={() => togglePeriod(period)}>{period}</button>)}</div></fieldset>}
+          <p className="plan-hint">{selected.type === '创作' ? (selected.dayIndex < 5 ? '工作日创作连接：默认目标 1 小时。' : '周末创作：两天合计留出 12 小时，约一天半。') : '只标记大致时段，不要求按分钟执行。'}</p>
+        </div>}
+        <button className="primary-button save-week-button" type="button" disabled={!changed} onClick={() => void saveWeekPlan(draft)}>{changed ? '保存本周计划' : '本周计划已保存'}</button>
+      </article>
+    </PageFrame>
   )
 }
 
