@@ -26,9 +26,19 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .hero { position: relative; height: 172px; overflow: hidden; border-radius: 0 0 30px 30px; background-image: linear-gradient(90deg, rgba(255,251,232,.3) 0%, rgba(255,251,232,.08) 43%, transparent 68%), url("./creative-planet-hero-v3.webp"); background-position: center center; background-size: cover; }
 .hero::after { content: ""; position: absolute; inset: auto 0 0; height: 34px; background: linear-gradient(transparent, rgba(248,239,223,.38)); }
 .preview-badge { position: absolute; z-index: 2; top: max(14px, calc(env(safe-area-inset-top) + 7px)); right: 14px; padding: 5px 8px; border: 1px solid rgba(255,255,255,.72); border-radius: 999px; color: #7a5b45; background: rgba(255,248,226,.58); backdrop-filter: blur(10px); font-size: 8px; letter-spacing: .06em; }
-.hero-copy { position: absolute; z-index: 2; left: 19px; bottom: 22px; width: 62%; }
-.hero-copy p { margin-bottom: 5px; color: #a16f4c; font-size: 8px; font-weight: 700; letter-spacing: .2em; }
-.hero-copy h1 { margin: 0; color: #644437; font-size: 20px; line-height: 1.5; letter-spacing: .01em; text-shadow: 0 1px 5px rgba(255,255,255,.92); }
+.hero-copy { position: absolute; z-index: 2; left: 20px; top: 44px; width: 59%; }
+.hero-copy p { margin-bottom: 5px; display: flex; align-items: center; gap: 7px; color: #9b6848; font-size: 8px; font-weight: 700; letter-spacing: .2em; }
+.hero-copy p::after { content: ""; width: 26px; height: 1px; background: rgba(199, 119, 74, .48); transform: rotate(-2deg); }
+.hero-title { margin: 0; color: #604239; font-family: STKaiti, KaiTi, "Kaiti SC", "Songti SC", serif; text-shadow: 0 1px 5px rgba(255,255,255,.92); }
+.hero-title span { display: block; }
+.title-first { display: flex !important; align-items: baseline; gap: 1px; white-space: nowrap; }
+.title-first em { font-size: 25px; font-style: normal; font-weight: 600; letter-spacing: .03em; }
+.title-first small { color: #77584c; font-size: 13px; letter-spacing: .035em; }
+.title-second { margin: 1px 0 -1px 3px; color: #9a6f5d; font-size: 11px; letter-spacing: .11em; }
+.title-third { display: flex !important; align-items: baseline; gap: 5px; white-space: nowrap; }
+.title-third strong { position: relative; font-size: 20px; font-weight: 600; letter-spacing: .035em; }
+.title-third strong::after { content: ""; position: absolute; left: -1px; right: -2px; bottom: -1px; height: 5px; border-bottom: 2px solid rgba(214, 126, 75, .6); border-radius: 50%; transform: rotate(-1.5deg); }
+.title-third small { color: #785a4f; font-size: 12px; letter-spacing: .08em; }
 
 .home-stack { position: relative; z-index: 3; margin-top: -5px; padding: 0 11px 24px; display: grid; gap: 8px; }
 .card { border: 1px solid var(--line); border-radius: 18px; background: var(--paper); box-shadow: 0 6px 18px rgba(54, 77, 98, .055); }
@@ -87,7 +97,10 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 
 @media (max-width: 375px) {
   .hero { height: 162px; }
-  .hero-copy h1 { font-size: 18px; }
+  .hero-copy { top: 40px; }
+  .title-first em { font-size: 23px; }
+  .title-first small { font-size: 12px; }
+  .title-third strong { font-size: 18px; }
   .home-stack { padding-inline: 9px; }
   .day { min-height: 60px; }
 }
