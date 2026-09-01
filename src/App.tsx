@@ -548,30 +548,82 @@ function PlanPage() {
 function ReviewPage() {
   const projects = useAppStore((state) => state.projects)
   const sessions = useAppStore((state) => state.sessions)
+  const weekPlan = useAppStore((state) => state.weekPlan)
   const review = useAppStore((state) => state.weekReview)
   const saveReview = useAppStore((state) => state.saveReview)
   const [done, setDone] = useState(review?.done ?? '')
   const [nextWeekGoal, setNextWeekGoal] = useState(review?.nextWeekGoal ?? '')
+  const [saved, setSaved] = useState(false)
   const weekStart = getWeekStart(Date.now())
   const summary = summarizeWeek(sessions, weekStart)
   const inWeek = sessions.filter((session) => session.weekStart === weekStart && session.type !== '健身')
   const byType = groupMinutes(inWeek, (session) => session.type)
   const byProject = groupMinutes(inWeek, (session) => projects.find((project) => project.id === session.projectId)?.name ?? '未归属项目')
+  const streak = passingWeekStreak(sessions, weekStart)
+  const easiestSlot = mostProductiveSlot(inWeek)
+  const missedSlot = firstMissedCreativeSlot(weekPlan, summary.nodeDateKeys)
 
-  useEffect(() => { setDone(review?.done ?? ''); setNextWeekGoal(review?.nextWeekGoal ?? '') }, [review])
+  useEffect(() => {
+    setDone(review?.done ?? '')
+    setNextWeekGoal(review?.nextWeekGoal ?? '')
+    setSaved(false)
+  }, [review])
+
+  async function submitReview() {
+    await saveReview(done, nextWeekGoal)
+    setSaved(true)
+  }
 
   return (
-    <PageFrame eyebrow="每一次回望，都是与未来的自己对话" title="本周复盘" image="hero3.jpg">
-      <article className="card review-summary">
-        <div className="metric-grid"><Metric label="节点" value={`${summary.nodeCount}/4`} progress={summary.nodeCount / 4} /><Metric label="创作" value={formatMinutes(summary.creativeMinutes)} progress={summary.creativeMinutes / 840} /><Metric label="结果" value={summary.passed ? '达标' : '未达标'} progress={summary.passed ? 1 : 0} tone={summary.passed ? 'green' : 'blue'} /></div>
-      </article>
-      <div className="review-breakdown"><Breakdown title="时间去了哪里" items={byType} /><Breakdown title="项目投入" items={byProject} /></div>
-      <article className="card review-form">
-        <label>这周我做成了什么？<textarea value={done} onChange={(event) => setDone(event.target.value)} /></label>
-        <label>下周最重要的一个作品增量<textarea value={nextWeekGoal} onChange={(event) => setNextWeekGoal(event.target.value)} /></label>
-        <button className="primary-button" type="button" onClick={() => void saveReview(done, nextWeekGoal)}>保存本周复盘</button>
-      </article>
-    </PageFrame>
+    <>
+      <header className="review-hero-v2" style={{ backgroundImage: 'url("./assets/review/review-hero-v2.webp")' }}>
+        <div className="review-hero-copy">
+          <h1 className="review-hero-title">本 周 复 盘</h1>
+          <p className="review-hero-subtitle">回头看见走过的星光</p>
+          <span className="review-hero-divider" aria-hidden="true">✦</span>
+          <blockquote>“你为热爱的事，<br />悄悄坚持着，<br />世界会记得。”</blockquote>
+        </div>
+      </header>
+
+      <section className="review-page-stack">
+        <section className={`review-achievement ${summary.passed ? 'passed' : ''}`}>
+          <img src="./assets/review/star.webp" alt="" aria-hidden="true" />
+          <div><h2>{summary.passed ? '本周已达标' : '本周仍在生长'}</h2><p>4 个创作节点 ＋ 累计 14 小时</p></div>
+          <strong>{streak > 0 ? `连续第 ${streak} 周` : '继续靠近'}</strong>
+        </section>
+
+        <section className="review-orbit-section" aria-labelledby="review-stars-heading">
+          <h2 id="review-stars-heading">这一周留下的星光</h2>
+          <div className="review-orbit" aria-label="本周四项统计">
+            <ReviewOrbitMetric className="orbit-one" image="creative.webp" label="创作节点" value={`${summary.nodeCount} / 4`} />
+            <ReviewOrbitMetric className="orbit-two" image="clock.webp" label="累计时长" value={formatMinutes(summary.creativeMinutes)} />
+            <ReviewOrbitMetric className="orbit-three" image="gym.webp" label="健身记录" value={`${summary.gymCount} 次`} />
+            <ReviewOrbitMetric className="orbit-four" image="star.webp" label="连续达标" value={`${streak} 周`} />
+          </div>
+        </section>
+
+        <ReviewTimeBreakdown items={byType} />
+        <ReviewProjectBreakdown items={byProject} />
+
+        <section className="review-rhythm" aria-labelledby="review-rhythm-heading">
+          <h2 id="review-rhythm-heading">这一周的创作节律</h2>
+          <div className="review-rhythm-grid">
+            <article><span>✦ 最容易进入状态</span><strong>{easiestSlot}</strong><img src="./assets/review/comet.webp" alt="" aria-hidden="true" /></article>
+            <article><span>✦ 最容易失约</span><strong>{missedSlot}</strong><span className="review-crescent" aria-hidden="true">☾</span></article>
+          </div>
+        </section>
+
+        <section className="review-journal" aria-labelledby="review-journal-heading">
+          <h2 id="review-journal-heading">把这一周写进星球日记</h2>
+          <div className="review-journal-paper">
+            <img src="./assets/review/book.webp" alt="" aria-hidden="true" />
+            <label><span>✦ 这周我做成了什么</span><textarea value={done} placeholder="写下这一周真正向前推进的部分……" onChange={(event) => { setDone(event.target.value); setSaved(false) }} /></label>
+            <label><span>✦ 下周最重要的一个作品增量</span><textarea value={nextWeekGoal} placeholder="不用很多，只写下一件最重要的事……" onChange={(event) => { setNextWeekGoal(event.target.value); setSaved(false) }} /></label>
+            <button className="primary-button review-save-button" type="button" onClick={() => void submitReview()}>{saved ? '这一周已收好' : '保存本周复盘'}</button>
+          </div>
+        </section>
+      </section>
+    </>
   )
 }
 
@@ -581,8 +633,82 @@ function groupMinutes(sessions: CreativeSession[], key: (session: CreativeSessio
   return [...groups.entries()].sort((a, b) => b[1] - a[1])
 }
 
-function Breakdown({ title, items }: { title: string; items: Array<[string, number]> }) {
-  return <article className="card breakdown-card"><h2>{title}</h2>{items.length ? items.slice(0, 5).map(([label, minutes]) => <div className="breakdown-line" key={label}><span>{label}</span><b>{formatMinutes(minutes)}</b></div>) : <p className="empty-copy">暂无记录</p>}</article>
+function ReviewOrbitMetric({ className, image, label, value }: { className: string; image: string; label: string; value: string }) {
+  return <div className={`review-orbit-metric ${className}`}><img src={`./assets/review/${image}`} alt="" aria-hidden="true" /><span>{label}</span><strong>{value}</strong></div>
+}
+
+const REVIEW_COLORS = ['#8d84d8', '#5c9fe1', '#69a8b5', '#71ae8e', '#e7b24c']
+
+function ReviewTimeBreakdown({ items }: { items: Array<[string, number]> }) {
+  const visible = items.slice(0, 5)
+  const total = visible.reduce((sum, [, minutes]) => sum + minutes, 0)
+  return (
+    <section className="review-time-section" aria-labelledby="review-time-heading">
+      <div className="review-section-title"><h2 id="review-time-heading">时间去了哪里</h2><span>{formatMinutes(total)}</span></div>
+      {visible.length ? <div className="review-time-list">{visible.map(([label, minutes], index) => (
+        <div className="review-time-row" key={label}>
+          <span className="review-time-icon" aria-hidden="true">{['🪶', '📖', '✦', '◉', '⭐'][index]}</span>
+          <b>{label}</b>
+          <div className="review-time-track"><i style={{ width: `${Math.max(7, total ? minutes / total * 100 : 0)}%`, background: REVIEW_COLORS[index] }} /></div>
+          <span>{formatMinutes(minutes)}</span>
+        </div>
+      ))}</div> : <p className="empty-copy">本周还没有创作记录，下一次连接会从这里亮起。</p>}
+    </section>
+  )
+}
+
+function ReviewProjectBreakdown({ items }: { items: Array<[string, number]> }) {
+  const visible = items.slice(0, 5)
+  const total = visible.reduce((sum, [, minutes]) => sum + minutes, 0)
+  let cursor = 0
+  const segments = visible.map(([, minutes], index) => {
+    const start = cursor
+    cursor += total ? minutes / total * 100 : 0
+    return `${REVIEW_COLORS[index]} ${start}% ${cursor}%`
+  })
+  const ringBackground = segments.length ? `conic-gradient(${segments.join(', ')})` : 'conic-gradient(#dce8f1 0 100%)'
+  return (
+    <section className="review-project-section" aria-labelledby="review-project-heading">
+      <div className="review-section-title"><h2 id="review-project-heading">项目投入</h2><span>按专注时长</span></div>
+      <div className="review-project-content">
+        <div className="review-project-ring" style={{ background: ringBackground }}><img src="./assets/review/planet.webp" alt="" aria-hidden="true" /></div>
+        {visible.length ? <div className="review-project-legend">{visible.map(([label, minutes], index) => (
+          <div key={label}><i style={{ background: REVIEW_COLORS[index] }} /><span><b>{label}</b><small>{formatMinutes(minutes)} · {Math.round(minutes / total * 100)}%</small></span></div>
+        ))}</div> : <p className="empty-copy">还没有项目投入记录。</p>}
+      </div>
+    </section>
+  )
+}
+
+function passingWeekStreak(sessions: CreativeSession[], currentWeek: string): number {
+  let streak = 0
+  let week = currentWeek
+  while (summarizeWeek(sessions, week).passed) {
+    streak += 1
+    week = addDaysKey(week, -7)
+  }
+  return streak
+}
+
+function mostProductiveSlot(sessions: CreativeSession[]): string {
+  if (!sessions.length) return '等待第一次连接'
+  const groups = new Map<string, number>()
+  sessions.forEach((session) => {
+    const date = new Date(`${session.dateKey}T00:00:00Z`)
+    const day = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getUTCDay()]
+    const hour = new Date(session.startedAt).getHours()
+    const period = hour < 12 ? '上午' : hour < 18 ? '下午' : '晚上'
+    const label = `${day}${period}`
+    groups.set(label, (groups.get(label) ?? 0) + session.durationMinutes)
+  })
+  return [...groups.entries()].sort((a, b) => b[1] - a[1])[0][0]
+}
+
+function firstMissedCreativeSlot(plan: WeekPlanItem[], completedDateKeys: string[]): string {
+  const completed = new Set(completedDateKeys)
+  const missed = plan.find((item) => item.type === '创作' && !completed.has(weekDateKey(item)))
+  if (!missed) return '没有失约'
+  return `${missed.dayLabel}${missed.periods[0] ?? ''}`
 }
 
 function SessionLine({ session, projects }: { session: CreativeSession; projects: Project[] }) {
