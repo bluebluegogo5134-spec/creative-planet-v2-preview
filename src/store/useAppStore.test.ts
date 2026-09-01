@@ -104,4 +104,21 @@ describe('session record workflow', () => {
       nextAction: '继续下一段'
     })
   })
+
+  it('records a gym check-in without requiring an exact duration', async () => {
+    await useAppStore.getState().addManualSession({
+      dateKey: '2026-08-31',
+      projectId: null,
+      type: '健身',
+      minutes: 0,
+      done: '力量训练'
+    })
+
+    expect(useAppStore.getState().sessions[0]).toMatchObject({
+      projectId: null,
+      type: '健身',
+      durationMinutes: 0,
+      done: '力量训练'
+    })
+  })
 })

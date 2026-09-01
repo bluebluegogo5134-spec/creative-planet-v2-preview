@@ -6,13 +6,14 @@ import { summarizeWeek, WEEKLY_MINUTE_GOAL, WEEKLY_NODE_GOAL } from './domain/we
 import { weekDateKey } from './data/defaults'
 import { createBackup, restoreBackup } from './data/backup'
 import { useAppStore } from './store/useAppStore'
+import homeHero from '../assets/home-hero-warm.webp'
 
 type Page = 'home' | 'projects' | 'session' | 'plan' | 'review'
 
 const NAV: Array<{ id: Page; icon: string; label: string }> = [
   { id: 'home', icon: '⌂', label: '首页' },
   { id: 'projects', icon: '◉', label: '项目' },
-  { id: 'session', icon: '＋', label: '记录' },
+  { id: 'session', icon: '✦', label: '建立连接' },
   { id: 'plan', icon: '☷', label: '计划' },
   { id: 'review', icon: '✦', label: '复盘' }
 ]
@@ -122,10 +123,14 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
 
   return (
     <>
-      <header className="home-hero" style={{ backgroundImage: 'linear-gradient(90deg, rgba(255,252,242,.96), rgba(232,242,251,.18)), url("./assets/hero2.jpg")' }}>
+      <header className="home-hero warm-home-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(255,251,232,.3) 0%, rgba(255,251,232,.08) 43%, transparent 68%), url("${homeHero}")` }}>
         <div className="hero-copy">
           <span>创作星球</span>
-          <h1>慢一点也没关系，<br />但不要离自己的星球太远</h1>
+          <h1 className="home-art-title" aria-label="慢一点也没关系，但不要离自己的星球太远">
+            <span className="home-title-first"><em>慢一点</em><small>，也没关系</small></span>
+            <span className="home-title-second">但不要离</span>
+            <span className="home-title-third"><strong>自己的星球</strong><small>太远</small></span>
+          </h1>
         </div>
       </header>
 
@@ -143,6 +148,7 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
             <Metric label="累计时长" value={formatMinutes(summary.creativeMinutes)} progress={summary.creativeMinutes / WEEKLY_MINUTE_GOAL} />
             <Metric label="健身" value={`${summary.gymCount}次`} progress={summary.gymCount / 2} tone="green" />
           </div>
+          {summary.nodeCount > WEEKLY_NODE_GOAL && <p className="extra-node-note">✦ 本周又多点亮了 {summary.nodeCount - WEEKLY_NODE_GOAL} 颗星</p>}
         </article>
 
         <article className="card current-project-card">
@@ -162,14 +168,6 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
           <button className="primary-button create-gate" type="button" onClick={() => goTo('session')}>
             {activeTimer.status === 'idle' ? '✦ 开始创作' : activeTimer.status === 'paused' ? '✦ 回去继续' : '✦ 创作进行中'}
           </button>
-        </article>
-
-        <article className="card leave-card">
-          <span className="moon">☾</span>
-          <div>
-            <p className="eyebrow">上次离开时</p>
-            <p>{recent[0]?.nextAction || '还没有记录，今天可以从很小的一步开始。'}</p>
-          </div>
         </article>
 
         <article className="card week-card">
@@ -347,6 +345,11 @@ function SessionPage() {
   const [showManual, setShowManual] = useState(false)
   const [editingSession, setEditingSession] = useState<CreativeSession | null>(null)
   const [sessionNotice, setSessionNotice] = useState('')
+  const [connectionMode, setConnectionMode] = useState<'creative' | 'gym'>('creative')
+  const [showGymDetails, setShowGymDetails] = useState(false)
+  const [gymMinutes, setGymMinutes] = useState(0)
+  const [gymType, setGymType] = useState('力量训练')
+  const [gymNote, setGymNote] = useState('')
   const [tick, setTick] = useState(Date.now())
 
   useEffect(() => {
@@ -359,9 +362,29 @@ function SessionPage() {
   const selectedProjectId = activeTimer.status !== 'idle' ? activeTimer.projectId : projectId
   const activeProject = projects.find((project) => project.id === selectedProjectId)
 
+  async function checkInGym() {
+    const done = [gymType, gymNote.trim()].filter(Boolean).join(' · ')
+    await addManualSession({
+      dateKey: toDateKey(Date.now()),
+      projectId: null,
+      type: '健身',
+      minutes: gymMinutes,
+      done: done || '完成一次健身'
+    })
+    setGymMinutes(0)
+    setGymNote('')
+    setShowGymDetails(false)
+    setSessionNotice('今天的健身已经点亮。')
+  }
+
   return (
-    <PageFrame eyebrow="走进花丛小径，进入你的故事" title="开始创作" image="hero5.jpg">
-      <article className="card timer-card">
+    <PageFrame eyebrow="与作品连接，也与身体连接" title="建立连接" image="hero5.jpg">
+      <div className="connection-mode-grid" role="tablist" aria-label="选择连接类型">
+        <button className={connectionMode === 'creative' ? 'selected' : ''} type="button" role="tab" aria-selected={connectionMode === 'creative'} onClick={() => setConnectionMode('creative')}><span>✦</span><b>创作连接</b><small>进入作品</small></button>
+        <button className={connectionMode === 'gym' ? 'selected gym' : 'gym'} type="button" role="tab" aria-selected={connectionMode === 'gym'} onClick={() => setConnectionMode('gym')}><span>○</span><b>健身打卡</b><small>连接身体</small></button>
+      </div>
+
+      {connectionMode === 'creative' ? <article className="card timer-card">
         {activeTimer.status === 'idle' ? (
           <>
             <label>选择项目<select value={projectId} onChange={(event) => setProjectId(event.target.value)}>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></label>
@@ -382,7 +405,19 @@ function SessionPage() {
             </div>
           </>
         )}
-      </article>
+      </article> : <article className="card gym-checkin-card">
+        <div className="gym-checkin-heading">
+          <span className="gym-planet" aria-hidden="true">✦</span>
+          <div><p className="eyebrow">今天也照顾好身体</p><h2>点亮一次健身</h2><p>不要求精确计时，完成就是一次连接。</p></div>
+        </div>
+        <button className="gym-detail-toggle" type="button" aria-expanded={showGymDetails} onClick={() => setShowGymDetails((value) => !value)}>{showGymDetails ? '收起选填信息' : '＋ 选填时长、类型和备注'}</button>
+        {showGymDetails && <div className="gym-detail-form">
+          <label>训练类型<select value={gymType} onChange={(event) => setGymType(event.target.value)}><option>力量训练</option><option>有氧训练</option><option>拉伸与恢复</option><option>综合训练</option><option>其他</option></select></label>
+          <label>时长（可不填）<select value={gymMinutes} onChange={(event) => setGymMinutes(Number(event.target.value))}><option value={0}>不记录时长</option><option value={30}>30 分钟</option><option value={45}>45 分钟</option><option value={60}>60 分钟</option><option value={90}>90 分钟</option><option value={120}>120 分钟</option></select></label>
+          <label>备注（可不填）<textarea value={gymNote} onChange={(event) => setGymNote(event.target.value)} placeholder="例如：练腿，状态不错" /></label>
+        </div>}
+        <button className="primary-button gym-checkin-button" type="button" onClick={() => void checkInGym()}>✦ 完成健身，点亮今天</button>
+      </article>}
 
       {sessionNotice && <p className="session-notice" role="status">{sessionNotice}</p>}
       {showFinish && activeTimer.status !== 'idle' && <FinishPanel close={() => setShowFinish(false)} save={async (input) => {
@@ -447,7 +482,7 @@ function ManualPanel({ projects, close, save }: { projects: Project[]; close: ()
   return (
     <article className="card finish-panel">
       <h2>手动补录</h2>
-      <div className="two-column-form"><label>日期<input type="date" value={dateKey} onChange={(event) => setDateKey(event.target.value)} /></label><label>分钟<input type="number" min="1" max="1440" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} /></label></div>
+      <div className="two-column-form"><label>日期<input type="date" value={dateKey} onChange={(event) => setDateKey(event.target.value)} /></label><label>分钟<input type="number" min={type === '健身' ? 0 : 1} max="1440" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} /></label></div>
       <label>类型<select value={type} onChange={(event) => setType(event.target.value as CreativeSession['type'])}>{[...CREATIVE_TYPES, '健身'].map((item) => <option key={item}>{item}</option>)}</select></label>
       {type !== '健身' && <label>项目<select value={projectId} onChange={(event) => setProjectId(event.target.value)}>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></label>}
       <label>推进了什么<textarea value={done} onChange={(event) => setDone(event.target.value)} /></label>
@@ -468,7 +503,7 @@ function EditSessionPanel({ session, projects, close, save }: { session: Creativ
   return (
     <article className="card finish-panel">
       <h2>编辑记录</h2>
-      <div className="two-column-form"><label>日期<input type="date" value={dateKey} onChange={(event) => setDateKey(event.target.value)} /></label><label>分钟<input type="number" min="1" max="1440" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} /></label></div>
+      <div className="two-column-form"><label>日期<input type="date" value={dateKey} onChange={(event) => setDateKey(event.target.value)} /></label><label>分钟<input type="number" min={type === '健身' ? 0 : 1} max="1440" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} /></label></div>
       <label>类型<select value={type} onChange={(event) => setType(event.target.value as CreativeSession['type'])}>{[...CREATIVE_TYPES, '健身'].map((item) => <option key={item}>{item}</option>)}</select></label>
       {type !== '健身' && <label>项目<select value={projectId} onChange={(event) => setProjectId(event.target.value)}>{projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}</select></label>}
       <label>推进了什么<textarea value={done} onChange={(event) => setDone(event.target.value)} /></label>
@@ -717,7 +752,7 @@ function SessionLine({ session, projects }: { session: CreativeSession; projects
     <div className="session-line">
       <span className="session-date">{session.dateKey.slice(5)}</span>
       <div><b>{session.type}{project ? ` · ${project.name}` : ''}</b><small>{session.done || session.goal || '留下了一次创作连接'}</small></div>
-      <strong>{formatMinutes(session.durationMinutes)}</strong>
+      <strong>{session.type === '健身' && session.durationMinutes === 0 ? '已打卡' : formatMinutes(session.durationMinutes)}</strong>
     </div>
   )
 }

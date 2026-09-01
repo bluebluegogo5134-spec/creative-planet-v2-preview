@@ -275,7 +275,8 @@ export const useAppStore = create<AppStore>((set, get) => {
 
     addManualSession: async (input) =>
       run(async () => {
-        const minutes = Math.max(1, Math.min(24 * 60, Math.round(input.minutes)))
+        const minimum = input.type === '健身' ? 0 : 1
+        const minutes = Math.max(minimum, Math.min(24 * 60, Math.round(input.minutes)))
         if (!/^\d{4}-\d{2}-\d{2}$/.test(input.dateKey)) throw new Error('日期格式不正确')
         const now = Date.now()
         const endedAt = Date.parse(`${input.dateKey}T12:00:00+08:00`)
@@ -303,7 +304,8 @@ export const useAppStore = create<AppStore>((set, get) => {
         const existing = await db.sessions.get(id)
         if (!existing) throw new Error('记录不存在')
         if (!/^\d{4}-\d{2}-\d{2}$/.test(input.dateKey)) throw new Error('日期格式不正确')
-        const minutes = Math.max(1, Math.min(24 * 60, Math.round(input.minutes)))
+        const minimum = input.type === '健身' ? 0 : 1
+        const minutes = Math.max(minimum, Math.min(24 * 60, Math.round(input.minutes)))
         const endedAt = input.dateKey === existing.dateKey
           ? existing.endedAt
           : Date.parse(`${input.dateKey}T12:00:00+08:00`)
