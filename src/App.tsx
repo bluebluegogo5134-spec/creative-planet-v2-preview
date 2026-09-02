@@ -13,10 +13,12 @@ type Page = 'home' | 'projects' | 'session' | 'plan' | 'review'
 const NAV: Array<{ id: Page; icon: string; label: string }> = [
   { id: 'home', icon: '⌂', label: '首页' },
   { id: 'projects', icon: '◉', label: '项目' },
-  { id: 'session', icon: '✦', label: '建立连接' },
+  { id: 'session', icon: '🪶', label: '建立连接' },
   { id: 'plan', icon: '☷', label: '计划' },
   { id: 'review', icon: '✦', label: '复盘' }
 ]
+
+const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=3`
 
 const PLAN_TYPES: Array<{ value: WeekPlanItem['type']; icon: string; label: string }> = [
   { value: '创作', icon: '🪶', label: '创作连接' },
@@ -380,7 +382,7 @@ function SessionPage() {
   return (
     <PageFrame eyebrow="与作品连接，也与身体连接" title="建立连接" image="hero5.jpg">
       <div className="connection-mode-grid" role="tablist" aria-label="选择连接类型">
-        <button className={connectionMode === 'creative' ? 'selected' : ''} type="button" role="tab" aria-selected={connectionMode === 'creative'} onClick={() => setConnectionMode('creative')}><span>✦</span><b>创作连接</b><small>进入作品</small></button>
+        <button className={connectionMode === 'creative' ? 'selected' : ''} type="button" role="tab" aria-selected={connectionMode === 'creative'} onClick={() => setConnectionMode('creative')}><span>🪶</span><b>创作连接</b><small>进入作品</small></button>
         <button className={connectionMode === 'gym' ? 'selected gym' : 'gym'} type="button" role="tab" aria-selected={connectionMode === 'gym'} onClick={() => setConnectionMode('gym')}><span>○</span><b>健身打卡</b><small>连接身体</small></button>
       </div>
 
@@ -611,7 +613,7 @@ function ReviewPage() {
 
   return (
     <>
-      <header className="review-hero-v2" style={{ backgroundImage: 'url("./assets/review/review-hero-v2.webp")' }}>
+      <header className="review-hero-v2" style={{ backgroundImage: `url("${reviewAsset('review-hero-v2.webp')}")` }}>
         <div className="review-hero-copy">
           <h1 className="review-hero-title">本 周 复 盘</h1>
           <p className="review-hero-subtitle">回头看见走过的星光</p>
@@ -622,7 +624,7 @@ function ReviewPage() {
 
       <section className="review-page-stack">
         <section className={`review-achievement ${summary.passed ? 'passed' : ''}`}>
-          <img src="./assets/review/star.webp" alt="" aria-hidden="true" />
+          <img src={reviewAsset('star.webp')} alt="" aria-hidden="true" />
           <div><h2>{summary.passed ? '本周已达标' : '本周仍在生长'}</h2><p>4 个创作节点 ＋ 累计 14 小时</p></div>
           <strong>{streak > 0 ? `连续第 ${streak} 周` : '继续靠近'}</strong>
         </section>
@@ -643,7 +645,7 @@ function ReviewPage() {
         <section className="review-rhythm" aria-labelledby="review-rhythm-heading">
           <h2 id="review-rhythm-heading">这一周的创作节律</h2>
           <div className="review-rhythm-grid">
-            <article><span>✦ 最容易进入状态</span><strong>{easiestSlot}</strong><img src="./assets/review/comet.webp" alt="" aria-hidden="true" /></article>
+            <article><span>✦ 最容易进入状态</span><strong>{easiestSlot}</strong><img src={reviewAsset('comet.webp')} alt="" aria-hidden="true" /></article>
             <article><span>✦ 最容易失约</span><strong>{missedSlot}</strong><span className="review-crescent" aria-hidden="true">☾</span></article>
           </div>
         </section>
@@ -651,7 +653,7 @@ function ReviewPage() {
         <section className="review-journal" aria-labelledby="review-journal-heading">
           <h2 id="review-journal-heading">把这一周写进星球日记</h2>
           <div className="review-journal-paper">
-            <img src="./assets/review/book.webp" alt="" aria-hidden="true" />
+            <img src={reviewAsset('book.webp')} alt="" aria-hidden="true" />
             <label><span>✦ 这周我做成了什么</span><textarea value={done} placeholder="写下这一周真正向前推进的部分……" onChange={(event) => { setDone(event.target.value); setSaved(false) }} /></label>
             <label><span>✦ 下周最重要的一个作品增量</span><textarea value={nextWeekGoal} placeholder="不用很多，只写下一件最重要的事……" onChange={(event) => { setNextWeekGoal(event.target.value); setSaved(false) }} /></label>
             <button className="primary-button review-save-button" type="button" onClick={() => void submitReview()}>{saved ? '这一周已收好' : '保存本周复盘'}</button>
@@ -669,7 +671,7 @@ function groupMinutes(sessions: CreativeSession[], key: (session: CreativeSessio
 }
 
 function ReviewOrbitMetric({ className, image, label, value }: { className: string; image: string; label: string; value: string }) {
-  return <div className={`review-orbit-metric ${className}`}><img src={`./assets/review/${image}`} alt="" aria-hidden="true" /><span>{label}</span><strong>{value}</strong></div>
+  return <div className={`review-orbit-metric ${className}`}><img src={reviewAsset(image)} alt="" aria-hidden="true" /><span>{label}</span><strong>{value}</strong></div>
 }
 
 const REVIEW_COLORS = ['#8d84d8', '#5c9fe1', '#69a8b5', '#71ae8e', '#e7b24c']
@@ -706,7 +708,7 @@ function ReviewProjectBreakdown({ items }: { items: Array<[string, number]> }) {
     <section className="review-project-section" aria-labelledby="review-project-heading">
       <div className="review-section-title"><h2 id="review-project-heading">项目投入</h2><span>按专注时长</span></div>
       <div className="review-project-content">
-        <div className="review-project-ring" style={{ background: ringBackground }}><img src="./assets/review/planet.webp" alt="" aria-hidden="true" /></div>
+        <div className="review-project-ring" style={{ background: ringBackground }}><img src={reviewAsset('planet.webp')} alt="" aria-hidden="true" /></div>
         {visible.length ? <div className="review-project-legend">{visible.map(([label, minutes], index) => (
           <div key={label}><i style={{ background: REVIEW_COLORS[index] }} /><span><b>{label}</b><small>{formatMinutes(minutes)} · {Math.round(minutes / total * 100)}%</small></span></div>
         ))}</div> : <p className="empty-copy">还没有项目投入记录。</p>}

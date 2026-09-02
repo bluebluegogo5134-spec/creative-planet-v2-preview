@@ -241,6 +241,13 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
   gap: 0;
   padding: 0 14px 30px;
   background:
+    radial-gradient(circle at 8% 5%, rgba(231,178,65,.72) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 92% 7%, rgba(231,178,65,.62) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 84% 18%, rgba(129,158,204,.52) 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 5% 35%, rgba(231,178,65,.68) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 94% 58%, rgba(133,159,205,.5) 0 1.2px, transparent 1.8px),
+    radial-gradient(circle at 12% 71%, rgba(231,178,65,.62) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 89% 89%, rgba(231,178,65,.68) 0 1.5px, transparent 2px),
     radial-gradient(ellipse at -8% 24%, rgba(204,225,244,.62), transparent 23%),
     radial-gradient(ellipse at 108% 50%, rgba(229,211,239,.48), transparent 25%),
     radial-gradient(ellipse at 4% 78%, rgba(249,221,170,.35), transparent 22%),
@@ -250,13 +257,32 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
   content: "";
   position: absolute;
   z-index: 0;
-  inset: 66px 5px 18px 11px;
-  border-left: 1px solid rgba(126,169,209,.42);
-  border-radius: 48% 0 0 42%;
-  background-image: radial-gradient(circle, rgba(225,173,67,.66) 0 1.5px, transparent 2px), radial-gradient(circle, rgba(143,177,215,.48) 0 1px, transparent 1.5px);
-  background-position: 4px 34px, 12px 76px;
-  background-size: 17px 94px, 23px 118px;
-  background-repeat: repeat-y;
+  inset: 34px 3px 12px;
+  border-left: 1px solid rgba(126,169,209,.38);
+  border-radius: 46% 0 0 38%;
+  background:
+    radial-gradient(ellipse 72% 9% at 48% 12%, transparent 68%, rgba(99,156,210,.42) 69%, transparent 70%),
+    radial-gradient(ellipse 74% 10% at 45% 31%, transparent 68%, rgba(188,145,210,.34) 69%, transparent 70%),
+    radial-gradient(ellipse 80% 8% at 50% 54%, transparent 68%, rgba(99,156,210,.3) 69%, transparent 70%),
+    radial-gradient(ellipse 72% 8% at 47% 78%, transparent 68%, rgba(188,145,210,.28) 69%, transparent 70%),
+    radial-gradient(circle, rgba(225,173,67,.68) 0 1.5px, transparent 2px),
+    radial-gradient(circle, rgba(143,177,215,.5) 0 1px, transparent 1.5px);
+  background-position: center, center, center, center, 4px 34px, 12px 76px;
+  background-size: auto, auto, auto, auto, 17px 94px, 23px 118px;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat-y, repeat-y;
+  pointer-events: none;
+}
+.review-page-stack::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background:
+    radial-gradient(circle at 104% 36%, rgba(255,245,196,.58) 0 19px, rgba(185,167,224,.34) 20px 24px, transparent 25px),
+    radial-gradient(ellipse 44px 10px at 99% 36%, transparent 58%, rgba(215,178,96,.38) 62% 68%, transparent 72%),
+    radial-gradient(circle at -3% 67%, rgba(255,236,155,.5) 0 14px, transparent 15px),
+    radial-gradient(circle at 103% 91%, rgba(223,210,241,.44) 0 24px, rgba(246,218,165,.28) 25px 31px, transparent 32px),
+    radial-gradient(ellipse 54px 11px at 99% 91%, transparent 58%, rgba(139,167,210,.32) 62% 68%, transparent 72%);
   pointer-events: none;
 }
 .review-page-stack > * { position: relative; z-index: 1; }
@@ -345,7 +371,7 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 
 .review-journal { padding: 22px 2px 4px; }
 .review-journal-paper { position: relative; display: grid; gap: 12px; padding: 14px 14px 17px; background: radial-gradient(ellipse at 24% 44%, rgba(255,241,210,.42), transparent 58%), radial-gradient(ellipse at 82% 76%, rgba(224,211,239,.36), transparent 51%); }
-.review-journal-paper > img { position: absolute; z-index: 0; right: -9px; top: -24px; width: 92px; height: 92px; object-fit: contain; opacity: .62; }
+.review-journal-paper > img { position: absolute; z-index: 1; right: -5px; top: 92px; width: 88px; height: 88px; object-fit: contain; opacity: .9; filter: drop-shadow(0 5px 9px rgba(75,95,133,.14)); pointer-events: none; }
 .review-journal-paper > label, .review-journal-paper > button { position: relative; z-index: 1; }
 .review-journal label { gap: 7px; color: var(--ink); font-size: 13px; }
 .review-journal label span { font-family: STKaiti, KaiTi, serif; font-size: 16px; }
