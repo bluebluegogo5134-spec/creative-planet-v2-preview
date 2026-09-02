@@ -262,7 +262,7 @@ function ProjectsPage() {
   }
 
   return (
-    <PageFrame eyebrow="把每一个想法，孕育成一颗星球" title="项目星系" image="hero1.jpg">
+    <PageFrame eyebrow="把散落的想法，养成自己的星球" title="项目星系" image="section-heroes/projects.webp">
       <div className="project-page-heading">
         <div><p className="eyebrow">你的创作星系</p><h2>已建立项目</h2><small>{projects.filter((project) => project.status === 'active').length} 个进行中 · {projects.filter((project) => project.status === 'archived').length} 个已归档</small></div>
         <button className="small-add-project" type="button" aria-expanded={creating} onClick={() => setCreating((value) => !value)}>{creating ? '收起' : '＋ 新建项目'}</button>
@@ -279,7 +279,6 @@ function ProjectsPage() {
           return <ProjectCard key={project.id} project={project} minutes={minutes} save={updateProject} archive={archiveProject} remove={deleteProject} />
         })}
       </div>
-      <DataSafetyCard />
     </PageFrame>
   )
 }
@@ -326,6 +325,10 @@ function ProjectCard({ project, minutes, save, archive, remove }: { project: Pro
 }
 
 function DataSafetyCard() {
+  const projects = useAppStore((state) => state.projects)
+  const sessions = useAppStore((state) => state.sessions)
+  const weekPlan = useAppStore((state) => state.weekPlan)
+  const review = useAppStore((state) => state.weekReview)
   const [status, setStatus] = useState('')
 
   async function download() {
@@ -352,9 +355,11 @@ function DataSafetyCard() {
   }
 
   return (
-    <article className="card data-card">
-      <div><p className="eyebrow">数据安全</p><h2>给创作留下可恢复的副本</h2><p className="empty-copy">数据只保存在当前设备。建议定期导出 JSON 备份。</p></div>
+    <article className="card data-card" aria-labelledby="data-safety-heading">
+      <div><p className="eyebrow">数据安全与迁移</p><h2 id="data-safety-heading">把整颗创作星球收好</h2><p className="empty-copy">项目、周计划、创作连接、健身记录和每周复盘，全部保存在当前设备中，不会自动上传。</p></div>
+      <div className="data-summary" aria-label="当前设备的数据概况"><span><b>{projects.length}</b> 个项目</span><span><b>{sessions.length}</b> 条连接</span><span><b>{weekPlan.length}</b> 天计划</span><span><b>{review ? 1 : 0}</b> 份本周复盘</span></div>
       <div className="button-row"><button className="secondary-button" type="button" onClick={() => void download()}>导出备份</button><label className="file-button">导入备份<input type="file" accept="application/json,.json" onChange={(event) => { const file = event.target.files?.[0]; if (file) void importFile(file); event.target.value = '' }} /></label></div>
+      <p className="data-warning">清除 Safari 网站数据或删除应用，可能同时清除本机记录。建议每周复盘后导出一次完整备份。</p>
       {status && <p className="data-status" role="status">{status}</p>}
     </article>
   )
@@ -412,7 +417,7 @@ function SessionPage() {
   }
 
   return (
-    <PageFrame eyebrow="与作品连接，也与身体连接" title="建立连接" image="hero5.jpg">
+    <PageFrame eyebrow="从此刻出发，只连接一件重要的事" title="建立连接" image="section-heroes/connection.webp">
       <div className="connection-mode-grid" role="tablist" aria-label="选择连接类型">
         <button className={connectionMode === 'creative' ? 'selected creative' : 'creative'} type="button" role="tab" aria-selected={connectionMode === 'creative'} onClick={() => setConnectionMode('creative')}><span><FeatherIcon className="connection-feather-icon" /></span><b>创作连接</b><small>进入作品</small></button>
         <button className={connectionMode === 'gym' ? 'selected gym' : 'gym'} type="button" role="tab" aria-selected={connectionMode === 'gym'} onClick={() => setConnectionMode('gym')}><span><CategoryIcon type="健身" className="connection-gym-icon" /></span><b>健身打卡</b><small>连接身体</small></button>
@@ -589,7 +594,7 @@ function PlanPage() {
   }
 
   return (
-    <PageFrame eyebrow="计划是边界，不是考勤" title="本周计划" image="hero4.jpg">
+    <PageFrame eyebrow="为热爱的事，先留出一片时间" title="本周计划" image="section-heroes/plan.webp">
       <article className="card weekly-goal-card">
         <p className="eyebrow">本周创作边界</p>
         <h2>工作日 2 次连接 · 周末留出一天半</h2>
@@ -690,6 +695,10 @@ function ReviewPage() {
             <label><span>✦ 下周最重要的一个作品增量</span><textarea value={nextWeekGoal} placeholder="不用很多，只写下一件最重要的事……" onChange={(event) => { setNextWeekGoal(event.target.value); setSaved(false) }} /></label>
             <button className="primary-button review-save-button" type="button" onClick={() => void submitReview()}>{saved ? '这一周已收好' : '保存本周复盘'}</button>
           </div>
+        </section>
+
+        <section className="review-data-section" aria-label="数据安全与备份">
+          <DataSafetyCard />
         </section>
       </section>
     </>
@@ -803,8 +812,12 @@ function SessionLine({ session, projects }: { session: CreativeSession; projects
 function PageFrame({ eyebrow, title, image, children }: { eyebrow: string; title: string; image: string; children: ReactNode }) {
   return (
     <>
-      <header className="page-hero" style={{ backgroundImage: `linear-gradient(180deg, rgba(237,245,251,.38), rgba(237,245,251,.9)), url("./assets/${image}")` }}>
-        <p>{eyebrow}</p><h1>{title}</h1>
+      <header className="page-hero" style={{ backgroundImage: `linear-gradient(180deg, rgba(255,251,238,.1), rgba(237,245,251,.62)), url("${import.meta.env.BASE_URL}assets/${image}")` }}>
+        <div className="page-hero-copy">
+          <p>{eyebrow}</p>
+          <h1>{title}</h1>
+          <span className="page-hero-ornament" aria-hidden="true">✦ · ·</span>
+        </div>
       </header>
       <section className="content-stack">{children}</section>
     </>
