@@ -424,9 +424,9 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .nav-icon { position: relative; min-width: 44px; min-height: 42px; display: grid; place-items: center; }
 .nav-item.active { color: #b36e54; }
 .nav-art-icon { display: block; width: 40px; height: 40px; object-fit: contain; transform: translateZ(0); filter: saturate(.92) drop-shadow(0 3px 4px rgba(85,103,135,.08)); transition: transform .18s ease, filter .18s ease; }
-.nav-home-icon { width: 45px; height: 45px; }
-.nav-projects-icon { width: 44px; height: 46px; }
-.nav-plan-icon { width: 43px; height: 43px; }
+.nav-home-icon { width: 54px; height: 54px; max-width: none; }
+.nav-projects-icon { width: 48px; height: 50px; max-width: none; }
+.nav-plan-icon { width: 48px; height: 48px; max-width: none; }
 .nav-review-icon { width: 40px; height: 40px; border-radius: 50%; }
 .nav-item.active .nav-art-icon { transform: translateY(-1px) scale(1.08); filter: saturate(1.04) drop-shadow(0 4px 6px rgba(83,104,153,.18)); }
 .nav-create .nav-icon { width: 48px; height: 48px; margin-top: -24px; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #e7a157, #d87860); box-shadow: 0 8px 19px rgba(180, 105, 71, .24); font-size: 25px; }
