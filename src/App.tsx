@@ -10,24 +10,56 @@ import homeHero from '../assets/home-hero-warm.webp'
 
 type Page = 'home' | 'projects' | 'session' | 'plan' | 'review'
 
-const NAV: Array<{ id: Page; icon: string; label: string }> = [
-  { id: 'home', icon: '⌂', label: '首页' },
-  { id: 'projects', icon: '◉', label: '项目' },
-  { id: 'session', icon: '🪶', label: '建立连接' },
-  { id: 'plan', icon: '☷', label: '计划' },
-  { id: 'review', icon: '✦', label: '复盘' }
+const NAV: Array<{ id: Page; label: string }> = [
+  { id: 'home', label: '首页' },
+  { id: 'projects', label: '项目' },
+  { id: 'session', label: '建立连接' },
+  { id: 'plan', label: '计划' },
+  { id: 'review', label: '复盘' }
 ]
 
 const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=3`
+const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=1`
+const restAsset = `${import.meta.env.BASE_URL}assets/rest-moon-cloud.svg?v=1`
+const navAssets: Record<Exclude<Page, 'session'>, string> = {
+  home: `${import.meta.env.BASE_URL}assets/nav/home.webp?v=1`,
+  projects: `${import.meta.env.BASE_URL}assets/nav/projects.webp?v=1`,
+  plan: `${import.meta.env.BASE_URL}assets/nav/plan.webp?v=1`,
+  review: `${import.meta.env.BASE_URL}assets/nav/review.webp?v=1`
+}
 
-const PLAN_TYPES: Array<{ value: WeekPlanItem['type']; icon: string; label: string }> = [
-  { value: '创作', icon: '🪶', label: '创作连接' },
-  { value: '健身', icon: '🏋️', label: '健身' },
-  { value: '自由', icon: '⭐', label: '自由' },
-  { value: '休息', icon: '☁️', label: '休息' }
+const PLAN_TYPES: Array<{ value: WeekPlanItem['type']; label: string }> = [
+  { value: '创作', label: '创作连接' },
+  { value: '健身', label: '健身' },
+  { value: '自由', label: '自由' },
+  { value: '休息', label: '休息' }
 ]
 
 const DAY_PERIODS: DayPeriod[] = ['上午', '下午', '晚上']
+
+function FeatherIcon({ className = '' }: { className?: string }) {
+  return <img className={`feather-pen-icon ${className}`.trim()} src={featherAsset} alt="" aria-hidden="true" />
+}
+
+function NavigationIcon({ page }: { page: Page }) {
+  if (page === 'session') return <FeatherIcon className="nav-feather-icon" />
+  return <img className={`nav-art-icon nav-${page}-icon`} src={navAssets[page]} alt="" aria-hidden="true" />
+}
+
+function CategoryIcon({ type, className = '' }: { type: WeekPlanItem['type']; className?: string }) {
+  const src = type === '创作'
+    ? featherAsset
+    : type === '健身'
+      ? reviewAsset('gym.webp')
+      : type === '自由'
+        ? reviewAsset('star.webp')
+        : restAsset
+  return <img className={`category-icon category-${type} ${className}`.trim()} src={src} alt="" aria-hidden="true" />
+}
+
+function planIcon(type: WeekPlanItem['type'], className = ''): ReactNode {
+  return <CategoryIcon type={type} className={className} />
+}
 
 function formatMinutes(minutes: number): string {
   if (minutes < 60) return `${Math.round(minutes)}m`
@@ -93,11 +125,11 @@ function App() {
           <button
             key={item.id}
             type="button"
-            className={`nav-item ${page === item.id ? 'active' : ''} ${item.id === 'session' ? 'nav-create' : ''}`}
+            className={`nav-item ${page === item.id ? 'active' : ''} ${item.id === 'session' ? 'nav-create' : ''} ${item.id === 'session' && activeTimer.status !== 'idle' ? 'nav-timer-active' : ''}`}
             onClick={() => goToPage(item.id)}
             aria-current={page === item.id ? 'page' : undefined}
           >
-            <span className="nav-icon">{item.id === 'session' && activeTimer.status !== 'idle' ? '●' : item.icon}</span>
+            <span className="nav-icon"><NavigationIcon page={item.id} /></span>
             <span>{item.label}</span>
           </button>
         ))}
@@ -183,7 +215,7 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
               return (
                 <div className={`day-chip ${completedDates.has(dateKey) ? 'done' : ''}`} key={item.id}>
                   <b>{item.dayLabel.replace('周', '')}</b>
-                  <span>{item.type === '创作' ? '🪶' : item.type === '健身' ? '🏋️' : item.type === '自由' ? '⭐' : '☾'}</span>
+                  <span>{planIcon(item.type, 'week-feather-icon')}</span>
                   <small>{completedDates.has(dateKey) ? '完成' : item.type}</small>
                 </div>
               )
@@ -382,8 +414,8 @@ function SessionPage() {
   return (
     <PageFrame eyebrow="与作品连接，也与身体连接" title="建立连接" image="hero5.jpg">
       <div className="connection-mode-grid" role="tablist" aria-label="选择连接类型">
-        <button className={connectionMode === 'creative' ? 'selected' : ''} type="button" role="tab" aria-selected={connectionMode === 'creative'} onClick={() => setConnectionMode('creative')}><span>🪶</span><b>创作连接</b><small>进入作品</small></button>
-        <button className={connectionMode === 'gym' ? 'selected gym' : 'gym'} type="button" role="tab" aria-selected={connectionMode === 'gym'} onClick={() => setConnectionMode('gym')}><span>○</span><b>健身打卡</b><small>连接身体</small></button>
+        <button className={connectionMode === 'creative' ? 'selected creative' : 'creative'} type="button" role="tab" aria-selected={connectionMode === 'creative'} onClick={() => setConnectionMode('creative')}><span><FeatherIcon className="connection-feather-icon" /></span><b>创作连接</b><small>进入作品</small></button>
+        <button className={connectionMode === 'gym' ? 'selected gym' : 'gym'} type="button" role="tab" aria-selected={connectionMode === 'gym'} onClick={() => setConnectionMode('gym')}><span><CategoryIcon type="健身" className="connection-gym-icon" /></span><b>健身打卡</b><small>连接身体</small></button>
       </div>
 
       {connectionMode === 'creative' ? <article className="card timer-card">
@@ -409,7 +441,7 @@ function SessionPage() {
         )}
       </article> : <article className="card gym-checkin-card">
         <div className="gym-checkin-heading">
-          <span className="gym-planet" aria-hidden="true">✦</span>
+          <span className="gym-planet" aria-hidden="true"><CategoryIcon type="健身" className="gym-heading-icon" /></span>
           <div><p className="eyebrow">今天也照顾好身体</p><h2>点亮一次健身</h2><p>不要求精确计时，完成就是一次连接。</p></div>
         </div>
         <button className="gym-detail-toggle" type="button" aria-expanded={showGymDetails} onClick={() => setShowGymDetails((value) => !value)}>{showGymDetails ? '收起选填信息' : '＋ 选填时长、类型和备注'}</button>
@@ -567,12 +599,12 @@ function PlanPage() {
         <div className="week-calendar" aria-label="选择要设置的日期">
           {draft.map((item, index) => {
             const type = PLAN_TYPES.find((option) => option.value === item.type) ?? PLAN_TYPES[0]
-            return <button key={item.id} className={`calendar-day ${selectedDay === index ? 'selected' : ''}`} type="button" onClick={() => setSelectedDay(index)}><b>{item.dayLabel.slice(1)}</b><span>{type.icon}</span><small>{type.label}</small></button>
+            return <button key={item.id} className={`calendar-day ${selectedDay === index ? 'selected' : ''}`} type="button" onClick={() => setSelectedDay(index)}><b>{item.dayLabel.slice(1)}</b><span>{planIcon(type.value, 'calendar-feather-icon')}</span><small>{type.label}</small></button>
           })}
         </div>
         {selected && <div className="day-plan-editor">
           <div><p className="eyebrow">{addDaysKey(selected.weekStart, selected.dayIndex)}</p><h2>设置{selected.dayLabel}</h2></div>
-          <fieldset><legend>这一天是什么日子？</legend><div className="plan-choice-grid">{PLAN_TYPES.map((option) => <button key={option.value} className={selected.type === option.value ? 'selected' : ''} type="button" onClick={() => chooseType(option.value)}><span>{option.icon}</span>{option.label}</button>)}</div></fieldset>
+          <fieldset><legend>这一天是什么日子？</legend><div className="plan-choice-grid">{PLAN_TYPES.map((option) => <button key={option.value} className={selected.type === option.value ? 'selected' : ''} type="button" onClick={() => chooseType(option.value)}><span>{planIcon(option.value, 'choice-feather-icon')}</span>{option.label}</button>)}</div></fieldset>
           {selected.type !== '自由' && selected.type !== '休息' && <fieldset><legend>大概安排在什么时候？可多选</legend><div className="period-choice-grid">{DAY_PERIODS.map((period) => <button key={period} className={selected.periods.includes(period) ? 'selected' : ''} type="button" onClick={() => togglePeriod(period)}>{period}</button>)}</div></fieldset>}
           <p className="plan-hint">{selected.type === '创作' ? (selected.dayIndex < 5 ? '工作日创作连接：默认目标 1 小时。' : '周末创作：两天合计留出 12 小时，约一天半。') : '只标记大致时段，不要求按分钟执行。'}</p>
         </div>}
@@ -676,6 +708,14 @@ function ReviewOrbitMetric({ className, image, label, value }: { className: stri
 
 const REVIEW_COLORS = ['#8d84d8', '#5c9fe1', '#69a8b5', '#71ae8e', '#e7b24c']
 
+function ReviewActivityIcon({ label }: { label: string }) {
+  if (label === '健身') return <CategoryIcon type="健身" className="review-feather-icon" />
+  if (label === '自由') return <CategoryIcon type="自由" className="review-feather-icon" />
+  if (label === '休息') return <CategoryIcon type="休息" className="review-feather-icon" />
+  if (label === '研究' || label === '阅读输入') return <img className="review-feather-icon" src={reviewAsset('book.webp')} alt="" aria-hidden="true" />
+  return <FeatherIcon className="review-feather-icon" />
+}
+
 function ReviewTimeBreakdown({ items }: { items: Array<[string, number]> }) {
   const visible = items.slice(0, 5)
   const total = visible.reduce((sum, [, minutes]) => sum + minutes, 0)
@@ -684,7 +724,7 @@ function ReviewTimeBreakdown({ items }: { items: Array<[string, number]> }) {
       <div className="review-section-title"><h2 id="review-time-heading">时间去了哪里</h2><span>{formatMinutes(total)}</span></div>
       {visible.length ? <div className="review-time-list">{visible.map(([label, minutes], index) => (
         <div className="review-time-row" key={label}>
-          <span className="review-time-icon" aria-hidden="true">{['🪶', '📖', '✦', '◉', '⭐'][index]}</span>
+          <span className="review-time-icon" aria-hidden="true"><ReviewActivityIcon label={label} /></span>
           <b>{label}</b>
           <div className="review-time-track"><i style={{ width: `${Math.max(7, total ? minutes / total * 100 : 0)}%`, background: REVIEW_COLORS[index] }} /></div>
           <span>{formatMinutes(minutes)}</span>
@@ -752,6 +792,7 @@ function SessionLine({ session, projects }: { session: CreativeSession; projects
   const project = projects.find((item) => item.id === session.projectId)
   return (
     <div className="session-line">
+      <span className="session-type-art" aria-hidden="true">{session.type === '健身' ? <CategoryIcon type="健身" /> : <FeatherIcon />}</span>
       <span className="session-date">{session.dateKey.slice(5)}</span>
       <div><b>{session.type}{project ? ` · ${project.name}` : ''}</b><small>{session.done || session.goal || '留下了一次创作连接'}</small></div>
       <strong>{session.type === '健身' && session.durationMinutes === 0 ? '已打卡' : formatMinutes(session.durationMinutes)}</strong>

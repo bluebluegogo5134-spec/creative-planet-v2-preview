@@ -135,16 +135,17 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .connection-mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .connection-mode-grid button { min-height: 70px; padding: 10px; display: grid; grid-template: auto auto / auto 1fr; align-items: center; column-gap: 8px; border: 1px solid var(--line); border-radius: 17px; color: var(--ink); background: rgba(255, 255, 255, .84); text-align: left; }
 .connection-mode-grid button > span { grid-row: 1 / 3; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #d98b63, #e8b15f); font-size: 17px; }
+.connection-mode-grid button.creative > span { width: 42px; height: 42px; background: transparent; }
 .connection-mode-grid button b { align-self: end; font-family: STKaiti, KaiTi, serif; font-size: 15px; }
 .connection-mode-grid button small { align-self: start; color: var(--muted); font-size: 9px; }
-.connection-mode-grid button.gym > span { background: linear-gradient(145deg, #87aa91, #6f947f); }
+.connection-mode-grid button.gym > span { width: 42px; height: 42px; background: transparent; }
 .connection-mode-grid button.selected { border-color: rgba(210, 126, 79, .48); background: #fff8ee; box-shadow: 0 5px 15px rgba(151, 92, 57, .08); }
 .connection-mode-grid button.gym.selected { border-color: rgba(105, 154, 126, .48); background: #f3faf5; }
 .gym-checkin-card { display: grid; gap: 12px; border-color: #d9e6dc; background: linear-gradient(145deg, rgba(255, 253, 245, .98), rgba(241, 249, 243, .98)); }
 .gym-checkin-heading { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 11px; }
 .gym-checkin-heading h2 { margin: 0 0 3px; font-size: 20px; }
 .gym-checkin-heading p:last-child { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
-.gym-planet { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid rgba(117, 157, 132, .28); border-radius: 50%; color: #e3ad55; background: radial-gradient(circle at 35% 32%, #fff7cb, #e8bb69 55%, #89aa91 58%, #6f907c); box-shadow: 0 5px 14px rgba(91, 128, 105, .16); }
+.gym-planet { width: 52px; height: 52px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; filter: drop-shadow(0 5px 7px rgba(91, 128, 105, .16)); }
 .gym-detail-toggle { min-height: 40px; border: 1px dashed #cbdccf; border-radius: 12px; color: #62816f; background: rgba(255, 255, 255, .72); font-size: 10px; font-weight: 700; }
 .gym-detail-form { display: grid; gap: 9px; }
 .gym-checkin-button { width: 100%; min-height: 50px; background: linear-gradient(135deg, #7ba089, #5f8974); box-shadow: 0 6px 15px rgba(74, 125, 96, .2); }
@@ -165,7 +166,9 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .record-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; border-bottom: 1px dashed var(--line); }
 .record-row:last-child { border-bottom: 0; }
 .record-actions { display: flex; align-items: center; }
-.session-line { min-width: 0; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 7px; padding: 9px 0; }
+.session-line { min-width: 0; display: grid; grid-template-columns: 28px 34px minmax(0, 1fr) auto; align-items: center; gap: 6px; padding: 9px 0; }
+.session-type-art { width: 28px; height: 28px; display: grid; place-items: center; }
+.session-type-art img { width: 28px; height: 28px; object-fit: contain; }
 .session-date { color: var(--muted); font-size: 10px; }
 .session-line b { display: block; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .session-line small { display: block; margin-top: 2px; overflow: hidden; color: var(--muted); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
@@ -381,9 +384,25 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 
 .bottom-nav { position: absolute; z-index: 20; left: 0; right: 0; bottom: 0; height: calc(var(--nav-height) + env(safe-area-inset-bottom)); padding: 8px 6px calc(7px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--line); background: rgba(255, 253, 248, .95); backdrop-filter: blur(18px); }
 .nav-item { min-width: 0; min-height: 62px; display: grid; place-items: center; align-content: center; gap: 4px; border: 0; color: #877d78; background: transparent; font-size: 11px; font-weight: 600; }
-.nav-icon { min-width: 32px; min-height: 28px; display: grid; place-items: center; font-size: 22px; }
+.nav-icon { position: relative; min-width: 34px; min-height: 30px; display: grid; place-items: center; }
 .nav-item.active { color: #b36e54; }
+.nav-art-icon { display: block; width: 32px; height: 32px; object-fit: contain; transform: translateZ(0); filter: saturate(.88) drop-shadow(0 3px 4px rgba(85,103,135,.08)); transition: transform .18s ease, filter .18s ease; }
+.nav-projects-icon { width: 29px; height: 33px; }
+.nav-plan-icon { width: 34px; height: 34px; }
+.nav-review-icon { width: 32px; height: 32px; border-radius: 50%; }
+.nav-item.active .nav-art-icon { transform: translateY(-1px) scale(1.08); filter: saturate(1.04) drop-shadow(0 4px 6px rgba(83,104,153,.18)); }
 .nav-create .nav-icon { width: 48px; height: 48px; margin-top: -24px; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #e7a157, #d87860); box-shadow: 0 8px 19px rgba(180, 105, 71, .24); font-size: 25px; }
+.nav-create .nav-icon:has(.nav-feather-icon) { background: transparent; box-shadow: 0 7px 16px rgba(88,116,157,.2); }
+.feather-pen-icon { display: block; object-fit: contain; }
+.category-icon { display: block; object-fit: contain; }
+.nav-feather-icon { width: 52px; height: 52px; max-width: none; }
+.nav-timer-active .nav-icon::after { content: ""; position: absolute; right: -1px; top: -3px; width: 10px; height: 10px; border: 2px solid #fffdf8; border-radius: 50%; background: #dc745d; box-shadow: 0 2px 5px rgba(129,73,66,.25); }
+.connection-feather-icon { width: 42px; height: 42px; }
+.connection-gym-icon { width: 44px; height: 44px; }
+.gym-heading-icon { width: 52px; height: 52px; }
+.week-feather-icon, .calendar-feather-icon { width: 25px; height: 25px; margin: auto; }
+.choice-feather-icon { width: 26px; height: 26px; }
+.review-feather-icon { width: 22px; height: 22px; margin: auto; }
 .nav-create { padding-top: 14px; }
 .error-banner { position: relative; z-index: 40; margin: 8px 12px; padding: 10px 12px; border: 1px solid #e5bdc3; border-radius: 12px; color: #985967; background: #fff4f5; font-size: 11px; }
 
