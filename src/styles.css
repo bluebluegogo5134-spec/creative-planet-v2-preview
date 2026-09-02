@@ -37,7 +37,8 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .loading-orbit { width: 62px; height: 62px; margin: 0 auto 14px; display: grid; place-items: center; border: 1px solid rgba(100, 140, 206, .28); border-radius: 50%; color: var(--gold); animation: pulse 1.8s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: scale(1.08); box-shadow: 0 0 30px rgba(230, 185, 87, .18); } }
 
-.home-hero { position: relative; height: 172px; overflow: hidden; border-radius: 0 0 28px 28px; background-position: center; background-size: cover; }
+.home-hero { position: relative; height: 214px; overflow: hidden; border-radius: 0 0 28px 28px; background-position: center 44%; background-size: cover; }
+.home-hero::before, .page-hero::before { content: ""; position: absolute; z-index: 0; inset: 0; background: linear-gradient(90deg, rgba(255,251,236,.36) 0%, rgba(255,251,236,.2) 32%, rgba(255,251,236,.05) 49%, transparent 61%); pointer-events: none; }
 .home-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 38px; background: linear-gradient(transparent, rgba(248, 239, 223, .42)); }
 .warm-home-hero { background-position: center; }
 .hero-copy { position: absolute; z-index: 1; left: 20px; top: max(44px, calc(env(safe-area-inset-top) + 18px)); width: 59%; }
@@ -55,12 +56,14 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .home-title-third strong::after { content: ""; position: absolute; right: -2px; bottom: -1px; left: -1px; height: 5px; border-bottom: 2px solid rgba(214, 126, 75, .6); border-radius: 50%; transform: rotate(-1.5deg); }
 .home-title-third small { color: #785a4f; font-size: 12px; letter-spacing: .08em; }
 .page-hero { height: 214px; padding: max(28px, calc(env(safe-area-inset-top) + 15px)) 21px 24px; display: flex; flex-direction: column; justify-content: flex-end; border-radius: 0 0 28px 28px; background-position: center 44%; background-size: cover; }
-.page-hero-copy { position: relative; width: min(52%, 220px); padding: 0 0 2px 2px; }
+.page-hero-copy { position: relative; z-index: 1; width: min(46%, 190px); padding: 0 0 2px 2px; }
 .page-hero p { max-width: 190px; margin: 0 0 5px; color: #496987; font-size: 11px; font-weight: 600; line-height: 1.45; letter-spacing: .07em; text-shadow: 0 1px 3px rgba(255, 255, 255, .98); }
 .page-hero h1 { margin: 0; font-size: 29px; letter-spacing: .06em; text-shadow: 0 1px 3px rgba(255, 255, 255, .96); }
 .page-hero-ornament { display: block; margin-top: 3px; color: #d7a83e; font-size: 10px; letter-spacing: .22em; text-shadow: 0 1px 2px rgba(255,255,255,.9); }
 
 .content-stack {
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: 10px;
   padding: 11px 12px 28px;
@@ -72,10 +75,20 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
     radial-gradient(circle at 8% 91%, rgba(230,184,76,.52) 0 1.4px, transparent 2px),
     radial-gradient(ellipse 92px 35px at 104% 23%, rgba(255,255,255,.72), transparent 72%),
     radial-gradient(ellipse 108px 38px at -7% 72%, rgba(219,234,246,.62), transparent 74%),
-    linear-gradient(180deg, rgba(246,251,253,.7), rgba(255,252,244,.82));
+    repeating-linear-gradient(0deg, rgba(91,119,156,.022) 0 1px, transparent 1px 5px),
+    linear-gradient(180deg, rgba(242,249,252,.94), rgba(255,249,236,.94));
 }
+.content-stack > :not(.surface-decoration) { position: relative; z-index: 1; }
+.surface-decoration { position: absolute; z-index: 0; inset: 0; overflow: hidden; pointer-events: none; }
+.surface-decoration img { position: absolute; object-fit: contain; }
+.surface-star { top: 74px; right: -29px; width: 88px; height: 88px; opacity: .24; filter: saturate(.86); }
+.surface-cloud { left: -37px; top: 41%; width: 106px; height: 106px; opacity: .2; filter: saturate(.8); }
+.surface-orbit { position: absolute; right: -44px; bottom: 12%; width: 180px; height: 74px; border-top: 1px solid rgba(112,150,196,.28); border-radius: 50%; transform: rotate(-12deg); }
+.surface-orbit::before, .surface-orbit::after { content: ""; position: absolute; border-radius: 50%; background: #e2b64f; box-shadow: 32px 13px 0 -1px rgba(111,151,203,.62), 72px -2px 0 rgba(225,180,70,.68), 116px 16px 0 -1px rgba(139,124,189,.48); }
+.surface-orbit::before { left: 14px; top: -3px; width: 4px; height: 4px; }
+.surface-orbit::after { right: 4px; top: 8px; width: 3px; height: 3px; }
 .home-stack { margin-top: -10px; position: relative; z-index: 2; }
-.card { border: 1px solid var(--line); border-radius: 20px; padding: 13px; background: rgba(255, 253, 248, .96); box-shadow: var(--shadow); }
+.card { border: 1px solid rgba(210,225,235,.9); border-radius: 20px; padding: 13px; background: rgba(255, 253, 248, .9); box-shadow: var(--shadow); backdrop-filter: blur(1.5px); }
 .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .section-heading.compact { align-items: center; }
 .section-heading h2, .card > h2 { margin: 0; font-size: 18px; line-height: 1.28; }
@@ -84,7 +97,9 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .status-seal.passed { border-color: #9bc3ae; color: #4d896d; background: #eff8f3; }
 .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
 .metric { min-width: 0; text-align: center; }
-.metric > span { display: block; color: var(--muted); font-size: 9px; }
+.metric-icon { width: 32px; height: 32px; margin: 0 auto 2px; display: grid; place-items: center; }
+.metric-icon img { width: 32px; height: 32px; object-fit: contain; filter: saturate(.95) drop-shadow(0 3px 4px rgba(66,95,135,.1)); }
+.metric-label { display: block; color: var(--muted); font-size: 9px; }
 .metric strong { display: block; margin: 3px 0 5px; font-size: 18px; }
 .extra-node-note { margin: 9px 0 0; color: #aa704d; text-align: center; font-size: 10px; }
 .progress-track { height: 4px; overflow: hidden; border-radius: 99px; background: #e8eef3; }
@@ -406,12 +421,13 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 
 .bottom-nav { position: absolute; z-index: 20; left: 0; right: 0; bottom: 0; height: calc(var(--nav-height) + env(safe-area-inset-bottom)); padding: 8px 6px calc(7px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--line); background: rgba(255, 253, 248, .95); backdrop-filter: blur(18px); }
 .nav-item { min-width: 0; min-height: 62px; display: grid; place-items: center; align-content: center; gap: 4px; border: 0; color: #877d78; background: transparent; font-size: 11px; font-weight: 600; }
-.nav-icon { position: relative; min-width: 34px; min-height: 30px; display: grid; place-items: center; }
+.nav-icon { position: relative; min-width: 44px; min-height: 42px; display: grid; place-items: center; }
 .nav-item.active { color: #b36e54; }
-.nav-art-icon { display: block; width: 32px; height: 32px; object-fit: contain; transform: translateZ(0); filter: saturate(.88) drop-shadow(0 3px 4px rgba(85,103,135,.08)); transition: transform .18s ease, filter .18s ease; }
-.nav-projects-icon { width: 29px; height: 33px; }
-.nav-plan-icon { width: 34px; height: 34px; }
-.nav-review-icon { width: 32px; height: 32px; border-radius: 50%; }
+.nav-art-icon { display: block; width: 40px; height: 40px; object-fit: contain; transform: translateZ(0); filter: saturate(.92) drop-shadow(0 3px 4px rgba(85,103,135,.08)); transition: transform .18s ease, filter .18s ease; }
+.nav-home-icon { width: 45px; height: 45px; }
+.nav-projects-icon { width: 44px; height: 46px; }
+.nav-plan-icon { width: 43px; height: 43px; }
+.nav-review-icon { width: 40px; height: 40px; border-radius: 50%; }
 .nav-item.active .nav-art-icon { transform: translateY(-1px) scale(1.08); filter: saturate(1.04) drop-shadow(0 4px 6px rgba(83,104,153,.18)); }
 .nav-create .nav-icon { width: 48px; height: 48px; margin-top: -24px; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #e7a157, #d87860); box-shadow: 0 8px 19px rgba(180, 105, 71, .24); font-size: 25px; }
 .nav-create .nav-icon:has(.nav-feather-icon) { background: transparent; box-shadow: 0 7px 16px rgba(88,116,157,.2); }
@@ -425,12 +441,13 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .week-feather-icon { width: 28px; height: 28px; margin: auto; }
 .calendar-feather-icon { width: 31px; height: 31px; margin: auto; }
 .choice-feather-icon { width: 40px; height: 40px; }
+.category-休息 { filter: saturate(1.38) contrast(1.12) drop-shadow(0 3px 4px rgba(66,96,136,.2)); transform: scale(1.1); }
 .review-feather-icon { width: 22px; height: 22px; margin: auto; }
 .nav-create { padding-top: 14px; }
 .error-banner { position: relative; z-index: 40; margin: 8px 12px; padding: 10px 12px; border: 1px solid #e5bdc3; border-radius: 12px; color: #985967; background: #fff4f5; font-size: 11px; }
 
 @media (max-width: 375px) {
-  .home-hero { height: 162px; }
+  .home-hero { height: 198px; }
   .page-hero { height: 198px; padding-right: 18px; padding-left: 18px; }
   .hero-copy { left: 18px; top: max(40px, calc(env(safe-area-inset-top) + 15px)); }
   .home-title-first em { font-size: 23px; }

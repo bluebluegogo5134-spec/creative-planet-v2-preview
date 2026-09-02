@@ -157,7 +157,7 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
 
   return (
     <>
-      <header className="home-hero warm-home-hero" style={{ backgroundImage: `linear-gradient(90deg, rgba(255,251,232,.3) 0%, rgba(255,251,232,.08) 43%, transparent 68%), url("${homeHero}")` }}>
+      <header className="home-hero warm-home-hero" style={{ backgroundImage: `url("${homeHero}")` }}>
         <div className="hero-copy">
           <span>创作星球</span>
           <h1 className="home-art-title" aria-label="慢一点也没关系，但不要离自己的星球太远">
@@ -169,6 +169,7 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
       </header>
 
       <section className="content-stack home-stack">
+        <SurfaceDecoration />
         <article className="card progress-card">
           <div className="section-heading">
             <div>
@@ -178,9 +179,9 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
             <span className={`status-seal ${summary.passed ? 'passed' : ''}`}>{summary.passed ? '达标' : '进行中'}</span>
           </div>
           <div className="metric-grid">
-            <Metric label="创作节点" value={`${summary.nodeCount}/${WEEKLY_NODE_GOAL}`} progress={summary.nodeCount / WEEKLY_NODE_GOAL} />
-            <Metric label="累计时长" value={formatMinutes(summary.creativeMinutes)} progress={summary.creativeMinutes / WEEKLY_MINUTE_GOAL} />
-            <Metric label="健身" value={`${summary.gymCount}次`} progress={summary.gymCount / 2} tone="green" />
+            <Metric icon={<CategoryIcon type="自由" />} label="创作节点" value={`${summary.nodeCount}/${WEEKLY_NODE_GOAL}`} progress={summary.nodeCount / WEEKLY_NODE_GOAL} />
+            <Metric icon={<img src={reviewAsset('clock.webp')} alt="" aria-hidden="true" />} label="累计时长" value={formatMinutes(summary.creativeMinutes)} progress={summary.creativeMinutes / WEEKLY_MINUTE_GOAL} />
+            <Metric icon={<CategoryIcon type="健身" />} label="健身" value={`${summary.gymCount}次`} progress={summary.gymCount / 2} tone="green" />
           </div>
           {summary.nodeCount > WEEKLY_NODE_GOAL && <p className="extra-node-note">✦ 本周又多点亮了 {summary.nodeCount - WEEKLY_NODE_GOAL} 颗星</p>}
         </article>
@@ -232,10 +233,11 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
   )
 }
 
-function Metric({ label, value, progress, tone = 'blue' }: { label: string; value: string; progress: number; tone?: 'blue' | 'green' }) {
+function Metric({ icon, label, value, progress, tone = 'blue' }: { icon: ReactNode; label: string; value: string; progress: number; tone?: 'blue' | 'green' }) {
   return (
     <div className="metric">
-      <span>{label}</span>
+      <span className="metric-icon" aria-hidden="true">{icon}</span>
+      <span className="metric-label">{label}</span>
       <strong>{value}</strong>
       <div className="progress-track"><i className={tone} style={{ width: `${Math.min(100, Math.max(0, progress * 100))}%` }} /></div>
     </div>
@@ -812,15 +814,25 @@ function SessionLine({ session, projects }: { session: CreativeSession; projects
 function PageFrame({ eyebrow, title, image, children }: { eyebrow: string; title: string; image: string; children: ReactNode }) {
   return (
     <>
-      <header className="page-hero" style={{ backgroundImage: `linear-gradient(180deg, rgba(255,251,238,.1), rgba(237,245,251,.62)), url("${import.meta.env.BASE_URL}assets/${image}")` }}>
+      <header className="page-hero" style={{ backgroundImage: `url("${import.meta.env.BASE_URL}assets/${image}?v=2")` }}>
         <div className="page-hero-copy">
           <p>{eyebrow}</p>
           <h1>{title}</h1>
           <span className="page-hero-ornament" aria-hidden="true">✦ · ·</span>
         </div>
       </header>
-      <section className="content-stack">{children}</section>
+      <section className="content-stack"><SurfaceDecoration />{children}</section>
     </>
+  )
+}
+
+function SurfaceDecoration() {
+  return (
+    <div className="surface-decoration" aria-hidden="true">
+      <img className="surface-star" src={reviewAsset('star.webp')} alt="" />
+      <img className="surface-cloud" src={restAsset} alt="" />
+      <i className="surface-orbit" />
+    </div>
   )
 }
 
