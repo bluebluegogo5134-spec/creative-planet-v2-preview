@@ -20,7 +20,7 @@ const NAV: Array<{ id: Page; label: string }> = [
 
 const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=3`
 const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=1`
-const restAsset = `${import.meta.env.BASE_URL}assets/rest-moon-cloud.svg?v=2`
+const restAsset = `${import.meta.env.BASE_URL}assets/rest-moon-cloud.svg?v=3`
 const navAssets: Record<Exclude<Page, 'session'>, string> = {
   home: `${import.meta.env.BASE_URL}assets/nav/home.webp?v=1`,
   projects: `${import.meta.env.BASE_URL}assets/nav/projects.webp?v=1`,
@@ -149,11 +149,7 @@ function HomePage({ goTo }: { goTo: (page: Page) => void }) {
   const summary = useMemo(() => summarizeWeek(sessions, currentWeek), [sessions, currentWeek])
   const project = projects.find((item) => item.id === currentProjectId) ?? projects[0]
   const recent = sessions.slice(0, 3)
-  const completedDates = new Set(
-    sessions
-      .filter((session) => session.weekStart === currentWeek && session.type !== '健身')
-      .map((session) => session.dateKey)
-  )
+  const completedDates = new Set(summary.nodeDateKeys)
 
   return (
     <>

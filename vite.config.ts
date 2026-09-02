@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192.png', 'icon-512.png', 'assets/*.jpg'],
+      includeAssets: ['apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'assets/*.jpg'],
       manifest: {
         id: './',
         name: '创作星球',

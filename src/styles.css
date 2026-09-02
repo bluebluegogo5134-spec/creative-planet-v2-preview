@@ -45,18 +45,18 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .hero-copy > span { display: flex; align-items: center; gap: 7px; color: #9b6848; font-size: 8px; font-weight: 700; letter-spacing: .2em; }
 .hero-copy > span::after { content: ""; width: 26px; height: 1px; background: rgba(199, 119, 74, .48); transform: rotate(-2deg); }
 .hero-copy h1 { margin: 12px 0 0; font-size: 20px; line-height: 1.62; letter-spacing: -.02em; text-shadow: 0 1px rgba(255,255,255,.88); }
-.home-art-title { margin: 5px 0 0 !important; color: #604239; font-family: STKaiti, KaiTi, "Kaiti SC", "Songti SC", serif; line-height: 1.2 !important; text-shadow: 0 1px 5px rgba(255, 255, 255, .92) !important; }
+.home-art-title { margin: 8px 0 0 !important; color: #604239; font-family: STKaiti, "Kaiti SC", KaiTi, "Songti SC", serif; font-weight: 500; line-height: 1.42 !important; letter-spacing: .025em !important; text-shadow: 0 1px 5px rgba(255, 255, 255, .92) !important; }
 .home-art-title span { display: block; }
-.home-title-first { display: flex !important; align-items: baseline; gap: 1px; white-space: nowrap; }
-.home-title-first em { font-size: 25px; font-style: normal; font-weight: 600; letter-spacing: .03em; }
+.home-title-first { display: flex !important; align-items: baseline; gap: 2px; white-space: nowrap; transform: rotate(-.7deg); transform-origin: left center; }
+.home-title-first em { font-size: 27px; font-style: normal; font-weight: 500; letter-spacing: .055em; }
 .home-title-first small { color: #77584c; font-size: 13px; letter-spacing: .035em; }
-.home-title-second { margin: 1px 0 -1px 3px; color: #9a6f5d; font-size: 11px; letter-spacing: .11em; }
+.home-title-second { margin: 5px 0 3px 4px; color: #9a6f5d; font-size: 12px; letter-spacing: .16em; }
 .home-title-third { display: flex !important; align-items: baseline; gap: 5px; white-space: nowrap; }
-.home-title-third strong { position: relative; font-size: 20px; font-weight: 600; letter-spacing: .035em; }
+.home-title-third strong { position: relative; font-size: 22px; font-weight: 500; letter-spacing: .065em; }
 .home-title-third strong::after { content: ""; position: absolute; right: -2px; bottom: -1px; left: -1px; height: 5px; border-bottom: 2px solid rgba(214, 126, 75, .6); border-radius: 50%; transform: rotate(-1.5deg); }
 .home-title-third small { color: #785a4f; font-size: 12px; letter-spacing: .08em; }
-.page-hero { height: 214px; padding: max(28px, calc(env(safe-area-inset-top) + 15px)) 21px 24px; display: flex; flex-direction: column; justify-content: flex-end; border-radius: 0 0 28px 28px; background-position: center 44%; background-size: cover; }
-.page-hero-copy { position: relative; z-index: 1; width: min(46%, 190px); padding: 0 0 2px 2px; }
+.page-hero { position: relative; height: 214px; overflow: hidden; border-bottom: 1px solid rgba(197,215,227,.72); border-radius: 0; background-position: center 44%; background-size: cover; }
+.page-hero-copy { position: absolute; z-index: 1; top: max(34px, calc(env(safe-area-inset-top) + 13px)); left: 21px; width: min(46%, 190px); padding: 0 0 2px 2px; }
 .page-hero p { max-width: 190px; margin: 0 0 5px; color: #496987; font-size: 11px; font-weight: 600; line-height: 1.45; letter-spacing: .07em; text-shadow: 0 1px 3px rgba(255, 255, 255, .98); }
 .page-hero h1 { margin: 0; font-size: 29px; letter-spacing: .06em; text-shadow: 0 1px 3px rgba(255, 255, 255, .96); }
 .page-hero-ornament { display: block; margin-top: 3px; color: #d7a83e; font-size: 10px; letter-spacing: .22em; text-shadow: 0 1px 2px rgba(255,255,255,.9); }
@@ -441,14 +441,17 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .week-feather-icon { width: 28px; height: 28px; margin: auto; }
 .calendar-feather-icon { width: 31px; height: 31px; margin: auto; }
 .choice-feather-icon { width: 40px; height: 40px; }
-.category-休息 { filter: saturate(1.38) contrast(1.12) drop-shadow(0 3px 4px rgba(66,96,136,.2)); transform: scale(1.1); }
+.category-休息 { filter: none; image-rendering: auto; }
+.choice-feather-icon.category-休息 { width: 44px; height: 44px; }
+.calendar-feather-icon.category-休息 { width: 34px; height: 34px; }
 .review-feather-icon { width: 22px; height: 22px; margin: auto; }
 .nav-create { padding-top: 14px; }
 .error-banner { position: relative; z-index: 40; margin: 8px 12px; padding: 10px 12px; border: 1px solid #e5bdc3; border-radius: 12px; color: #985967; background: #fff4f5; font-size: 11px; }
 
 @media (max-width: 375px) {
   .home-hero { height: 198px; }
-  .page-hero { height: 198px; padding-right: 18px; padding-left: 18px; }
+  .page-hero { height: 198px; }
+  .page-hero-copy { left: 18px; }
   .hero-copy { left: 18px; top: max(40px, calc(env(safe-area-inset-top) + 15px)); }
   .home-title-first em { font-size: 23px; }
   .home-title-first small { font-size: 12px; }

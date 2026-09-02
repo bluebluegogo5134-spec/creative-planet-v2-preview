@@ -28,7 +28,7 @@ function session(
 }
 
 describe('weekly summary', () => {
-  it('counts one node per actual creative day, including unplanned days', () => {
+  it('counts one node per day after creative time reaches thirty minutes', () => {
     const result = summarizeWeek(
       [
         session('1', '2026-08-24', 60),
@@ -42,6 +42,21 @@ describe('weekly summary', () => {
     expect(result.nodeCount).toBe(3)
     expect(result.creativeMinutes).toBe(225)
     expect(result.nodeDateKeys).toEqual(['2026-08-24', '2026-08-26', '2026-08-28'])
+  })
+
+  it('accumulates short sessions on the same day before lighting a node', () => {
+    const result = summarizeWeek(
+      [
+        session('1', '2026-08-24', 12),
+        session('2', '2026-08-24', 18, '研究'),
+        session('3', '2026-08-25', 29)
+      ],
+      '2026-08-24'
+    )
+
+    expect(result.nodeCount).toBe(1)
+    expect(result.nodeDateKeys).toEqual(['2026-08-24'])
+    expect(result.creativeMinutes).toBe(59)
   })
 
   it('keeps gym activity separate from creation', () => {
