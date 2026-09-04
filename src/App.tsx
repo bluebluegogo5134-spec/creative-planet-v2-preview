@@ -682,7 +682,7 @@ function ReviewPage() {
           <h2 id="review-rhythm-heading">这一周的创作节律</h2>
           <div className="review-rhythm-grid">
             <article><span>✦ 最容易进入状态</span><strong>{easiestSlot}</strong><img src={reviewAsset('comet.webp')} alt="" aria-hidden="true" /></article>
-            <article><span>✦ 最容易失约</span><strong>{missedSlot}</strong><span className="review-crescent" aria-hidden="true">☾</span></article>
+            <article><span>✦ 最容易失约</span><strong>{missedSlot}</strong><img className="review-missed-icon" src={reviewAsset('moon-cloud.png')} alt="" aria-hidden="true" /></article>
           </div>
         </section>
 

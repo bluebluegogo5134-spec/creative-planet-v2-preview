@@ -416,7 +416,7 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .review-rhythm-grid span { color: #456789; font-size: 12px; }
 .review-rhythm-grid strong { display: block; margin-top: 10px; font-family: STKaiti, KaiTi, serif; font-size: 24px; }
 .review-rhythm-grid img { position: absolute; right: -4px; bottom: -3px; width: 86px; height: 86px; object-fit: contain; opacity: .9; }
-.review-crescent { position: absolute; right: 18px; bottom: 14px; color: #edb94e !important; font-size: 55px !important; line-height: 1; text-shadow: 9px 5px 0 rgba(221,235,246,.9); }
+.review-rhythm-grid .review-missed-icon { right: -2px; bottom: -5px; width: 92px; height: 92px; opacity: .94; filter: drop-shadow(0 5px 8px rgba(87,100,164,.12)); }
 
 .review-journal { padding: 22px 2px 4px; }
 .review-journal-paper { position: relative; display: grid; gap: 12px; padding: 14px 14px 17px; background: radial-gradient(ellipse at 24% 44%, rgba(255,241,210,.42), transparent 58%), radial-gradient(ellipse at 82% 76%, rgba(224,211,239,.36), transparent 51%); }
