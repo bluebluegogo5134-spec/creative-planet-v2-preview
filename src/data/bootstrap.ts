@@ -104,9 +104,11 @@ function migrateWeekPlan(
     dayIndex,
     dayLabel: text(item.day, `第${dayIndex + 1}天`),
     type:
-      item.type === '健身' || item.type === '自由' || item.type === '休息'
+      item.type === '健身' || item.type === '自由' || item.type === '学习'
         ? item.type
-        : '创作',
+        : item.type === '休息'
+          ? '学习'
+          : '创作',
     periods: [],
     start: text(item.start),
     end: text(item.end),
@@ -150,12 +152,26 @@ export async function ensureWeekPlan(weekStart: string, now: number): Promise<vo
   await db.weekPlans.bulkPut(createDefaultWeekPlan(weekStart, now))
 }
 
+async function migrateStudyPlan(now: number): Promise<void> {
+  const plans = await db.weekPlans.toArray()
+  const migrated = plans
+    .filter((item) => (item.type as string) === '休息')
+    .map((item) => ({
+      ...item,
+      type: '学习' as const,
+      note: item.note === '休息' ? '学习' : item.note,
+      updatedAt: now
+    }))
+  if (migrated.length) await db.weekPlans.bulkPut(migrated)
+}
+
 export async function bootstrapDatabase(now = Date.now()): Promise<void> {
   const initialized = await db.appState.get('schemaVersion')
   const weekStart = getWeekStart(now)
 
   if (initialized) {
     await ensureWeekPlan(weekStart, now)
+    await migrateStudyPlan(now)
     return
   }
 

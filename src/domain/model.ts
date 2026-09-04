@@ -12,7 +12,7 @@ export const CREATIVE_TYPES = [
 
 export type CreativeType = (typeof CREATIVE_TYPES)[number]
 export type ActivityType = CreativeType | '健身'
-export type PlanType = '创作' | '健身' | '自由' | '休息'
+export type PlanType = '创作' | '健身' | '自由' | '学习'
 export type DayPeriod = '上午' | '下午' | '晚上'
 export type ProjectStatus = 'active' | 'archived'
 

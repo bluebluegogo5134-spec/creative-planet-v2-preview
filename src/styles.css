@@ -55,11 +55,22 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .home-title-third strong { position: relative; font-size: 22px; font-weight: 500; letter-spacing: .065em; }
 .home-title-third strong::after { content: ""; position: absolute; right: -2px; bottom: -1px; left: -1px; height: 5px; border-bottom: 2px solid rgba(214, 126, 75, .6); border-radius: 50%; transform: rotate(-1.5deg); }
 .home-title-third small { color: #785a4f; font-size: 12px; letter-spacing: .08em; }
-.page-hero { position: relative; height: 214px; overflow: hidden; border-bottom: 1px solid rgba(197,215,227,.72); border-radius: 0; background-position: center 44%; background-size: cover; }
-.page-hero-copy { position: absolute; z-index: 1; top: max(34px, calc(env(safe-area-inset-top) + 13px)); left: 21px; width: min(46%, 190px); padding: 0 0 2px 2px; }
-.page-hero p { max-width: 190px; margin: 0 0 5px; color: #496987; font-size: 11px; font-weight: 600; line-height: 1.45; letter-spacing: .07em; text-shadow: 0 1px 3px rgba(255, 255, 255, .98); }
-.page-hero h1 { margin: 0; font-size: 29px; letter-spacing: .06em; text-shadow: 0 1px 3px rgba(255, 255, 255, .96); }
-.page-hero-ornament { display: block; margin-top: 3px; color: #d7a83e; font-size: 10px; letter-spacing: .22em; text-shadow: 0 1px 2px rgba(255,255,255,.9); }
+.page-hero { position: relative; height: 214px; overflow: hidden; padding: 0; border-bottom: 1px solid rgba(197,215,227,.72); border-radius: 0; background-position: center 46%; background-size: cover; }
+.page-hero::before { background: linear-gradient(90deg, rgba(255,248,224,.22) 0%, rgba(255,248,224,.1) 31%, transparent 50%); }
+.page-hero::after { content: ""; position: absolute; inset: auto 0 0; height: 27px; background: linear-gradient(transparent, rgba(239,246,249,.5)); pointer-events: none; }
+.page-hero-copy { position: absolute; z-index: 1; left: 21px; top: max(43px, calc(env(safe-area-inset-top) + 17px)); width: min(45%, 176px); color: #3f5872; }
+.page-hero h1 { margin: 0; font-size: 29px; font-weight: 600; line-height: 1.12; letter-spacing: .12em; text-shadow: 0 1px 1px rgba(255,255,255,.82), 0 2px 7px rgba(255,248,224,.6); }
+.page-hero p { max-width: 174px; margin: 7px 0 0; color: #526b7e; font-family: STKaiti, KaiTi, "Kaiti SC", "Songti SC", serif; font-size: 12px; font-weight: 600; line-height: 1.7; letter-spacing: .075em; text-wrap: balance; text-shadow: 0 1px 1px rgba(255,255,255,.92), 0 2px 5px rgba(255,248,224,.52); }
+.page-hero-ornament { display: flex; align-items: center; gap: 5px; width: 58px; margin-top: 7px; color: #d4a438; font-size: 9px; letter-spacing: .18em; text-shadow: 0 1px 2px rgba(255,255,255,.86); }
+.page-hero-ornament::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(212,164,56,.68), transparent); transform: rotate(-2deg); }
+.page-hero-projects { background-position: 51% 46%; }
+.page-hero-projects .page-hero-copy { top: max(41px, calc(env(safe-area-inset-top) + 16px)); color: #465d73; }
+.page-hero-connection { background-position: 50% 47%; }
+.page-hero-connection .page-hero-copy { top: max(39px, calc(env(safe-area-inset-top) + 15px)); color: #684c3c; }
+.page-hero-connection p { color: #775c49; }
+.page-hero-plan { background-position: 52% 48%; }
+.page-hero-plan .page-hero-copy { top: max(39px, calc(env(safe-area-inset-top) + 15px)); color: #554b72; }
+.page-hero-plan p { color: #665c7f; }
 
 .content-stack {
   position: relative;
@@ -441,9 +452,9 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .week-feather-icon { width: 28px; height: 28px; margin: auto; }
 .calendar-feather-icon { width: 31px; height: 31px; margin: auto; }
 .choice-feather-icon { width: 40px; height: 40px; }
-.category-休息 { filter: none; image-rendering: auto; }
-.choice-feather-icon.category-休息 { width: 44px; height: 44px; }
-.calendar-feather-icon.category-休息 { width: 34px; height: 34px; }
+.category-学习 { filter: saturate(1.03) drop-shadow(0 3px 4px rgba(75,95,133,.12)); image-rendering: auto; }
+.choice-feather-icon.category-学习 { width: 46px; height: 46px; }
+.calendar-feather-icon.category-学习 { width: 36px; height: 36px; }
 .review-feather-icon { width: 22px; height: 22px; margin: auto; }
 .nav-create { padding-top: 14px; }
 .error-banner { position: relative; z-index: 40; margin: 8px 12px; padding: 10px 12px; border: 1px solid #e5bdc3; border-radius: 12px; color: #985967; background: #fff4f5; font-size: 11px; }
@@ -451,7 +462,9 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 @media (max-width: 375px) {
   .home-hero { height: 198px; }
   .page-hero { height: 198px; }
-  .page-hero-copy { left: 18px; }
+  .page-hero-copy { left: 18px; width: min(46%, 166px); }
+  .page-hero h1 { font-size: 27px; }
+  .page-hero p { max-width: 164px; font-size: 11.5px; }
   .hero-copy { left: 18px; top: max(40px, calc(env(safe-area-inset-top) + 15px)); }
   .home-title-first em { font-size: 23px; }
   .home-title-first small { font-size: 12px; }

@@ -20,7 +20,8 @@ const NAV: Array<{ id: Page; label: string }> = [
 
 const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=3`
 const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=1`
-const restAsset = `${import.meta.env.BASE_URL}assets/rest-moon-cloud.svg?v=3`
+const studyAsset = `${import.meta.env.BASE_URL}assets/review/book.webp?v=4`
+const surfaceAccentAsset = `${import.meta.env.BASE_URL}assets/review/comet.webp?v=3`
 const navAssets: Record<Exclude<Page, 'session'>, string> = {
   home: `${import.meta.env.BASE_URL}assets/nav/home.webp?v=1`,
   projects: `${import.meta.env.BASE_URL}assets/nav/projects.webp?v=1`,
@@ -32,7 +33,7 @@ const PLAN_TYPES: Array<{ value: WeekPlanItem['type']; label: string }> = [
   { value: '创作', label: '创作连接' },
   { value: '健身', label: '健身' },
   { value: '自由', label: '自由' },
-  { value: '休息', label: '休息' }
+  { value: '学习', label: '学习' }
 ]
 
 const DAY_PERIODS: DayPeriod[] = ['上午', '下午', '晚上']
@@ -53,7 +54,7 @@ function CategoryIcon({ type, className = '' }: { type: WeekPlanItem['type']; cl
       ? reviewAsset('gym.webp')
       : type === '自由'
         ? reviewAsset('star.webp')
-        : restAsset
+        : studyAsset
   return <img className={`category-icon category-${type} ${className}`.trim()} src={src} alt="" aria-hidden="true" />
 }
 
@@ -583,7 +584,7 @@ function PlanPage() {
   }
 
   function chooseType(type: WeekPlanItem['type']) {
-    updateSelected({ type, countsAsPlannedNode: type === '创作', periods: type === '自由' || type === '休息' ? [] : selected.periods })
+    updateSelected({ type, countsAsPlannedNode: type === '创作', periods: type === '自由' ? [] : selected.periods })
   }
 
   function togglePeriod(period: DayPeriod) {
@@ -608,7 +609,7 @@ function PlanPage() {
         {selected && <div className="day-plan-editor">
           <div><p className="eyebrow">{addDaysKey(selected.weekStart, selected.dayIndex)}</p><h2>设置{selected.dayLabel}</h2></div>
           <fieldset><legend>这一天是什么日子？</legend><div className="plan-choice-grid">{PLAN_TYPES.map((option) => <button key={option.value} className={selected.type === option.value ? 'selected' : ''} type="button" onClick={() => chooseType(option.value)}><span>{planIcon(option.value, 'choice-feather-icon')}</span>{option.label}</button>)}</div></fieldset>
-          {selected.type !== '自由' && selected.type !== '休息' && <fieldset><legend>大概安排在什么时候？可多选</legend><div className="period-choice-grid">{DAY_PERIODS.map((period) => <button key={period} className={selected.periods.includes(period) ? 'selected' : ''} type="button" onClick={() => togglePeriod(period)}>{period}</button>)}</div></fieldset>}
+          {selected.type !== '自由' && <fieldset><legend>大概安排在什么时候？可多选</legend><div className="period-choice-grid">{DAY_PERIODS.map((period) => <button key={period} className={selected.periods.includes(period) ? 'selected' : ''} type="button" onClick={() => togglePeriod(period)}>{period}</button>)}</div></fieldset>}
           <p className="plan-hint">{selected.type === '创作' ? (selected.dayIndex < 5 ? '工作日创作连接：默认目标 1 小时。' : '周末创作：两天合计留出 12 小时，约一天半。') : '只标记大致时段，不要求按分钟执行。'}</p>
         </div>}
         <button className="primary-button save-week-button" type="button" disabled={!changed} onClick={() => void saveWeekPlan(draft)}>{changed ? '保存本周计划' : '本周计划已保存'}</button>
@@ -718,7 +719,7 @@ const REVIEW_COLORS = ['#8d84d8', '#5c9fe1', '#69a8b5', '#71ae8e', '#e7b24c']
 function ReviewActivityIcon({ label }: { label: string }) {
   if (label === '健身') return <CategoryIcon type="健身" className="review-feather-icon" />
   if (label === '自由') return <CategoryIcon type="自由" className="review-feather-icon" />
-  if (label === '休息') return <CategoryIcon type="休息" className="review-feather-icon" />
+  if (label === '学习') return <CategoryIcon type="学习" className="review-feather-icon" />
   if (label === '研究' || label === '阅读输入') return <img className="review-feather-icon" src={reviewAsset('book.webp')} alt="" aria-hidden="true" />
   return <FeatherIcon className="review-feather-icon" />
 }
@@ -808,13 +809,14 @@ function SessionLine({ session, projects }: { session: CreativeSession; projects
 }
 
 function PageFrame({ eyebrow, title, image, children }: { eyebrow: string; title: string; image: string; children: ReactNode }) {
+  const heroName = image.split('/').at(-1)?.replace('.webp', '') ?? 'default'
   return (
     <>
-      <header className="page-hero" style={{ backgroundImage: `url("${import.meta.env.BASE_URL}assets/${image}?v=2")` }}>
+      <header className={`page-hero page-hero-${heroName}`} style={{ backgroundImage: `url("${import.meta.env.BASE_URL}assets/${image}?v=3")` }}>
         <div className="page-hero-copy">
-          <p>{eyebrow}</p>
           <h1>{title}</h1>
           <span className="page-hero-ornament" aria-hidden="true">✦ · ·</span>
+          <p>{eyebrow}</p>
         </div>
       </header>
       <section className="content-stack"><SurfaceDecoration />{children}</section>
@@ -826,7 +828,7 @@ function SurfaceDecoration() {
   return (
     <div className="surface-decoration" aria-hidden="true">
       <img className="surface-star" src={reviewAsset('star.webp')} alt="" />
-      <img className="surface-cloud" src={restAsset} alt="" />
+      <img className="surface-cloud" src={surfaceAccentAsset} alt="" />
       <i className="surface-orbit" />
     </div>
   )
