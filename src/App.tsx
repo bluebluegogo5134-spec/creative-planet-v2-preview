@@ -20,7 +20,7 @@ const NAV: Array<{ id: Page; label: string }> = [
 
 const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=3`
 const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=1`
-const studyAsset = `${import.meta.env.BASE_URL}assets/study-book.png?v=1`
+const studyAsset = `${import.meta.env.BASE_URL}assets/study-book-clean.png?v=1`
 const surfaceAccentAsset = `${import.meta.env.BASE_URL}assets/review/comet.webp?v=3`
 const navAssets: Record<Exclude<Page, 'session'>, string> = {
   home: `${import.meta.env.BASE_URL}assets/nav/home.webp?v=1`,
@@ -720,7 +720,7 @@ function ReviewActivityIcon({ label }: { label: string }) {
   if (label === '健身') return <CategoryIcon type="健身" className="review-feather-icon" />
   if (label === '自由') return <CategoryIcon type="自由" className="review-feather-icon" />
   if (label === '学习') return <CategoryIcon type="学习" className="review-feather-icon" />
-  if (label === '研究' || label === '阅读输入') return <img className="review-feather-icon" src={reviewAsset('book.webp')} alt="" aria-hidden="true" />
+  if (label === '研究' || label === '阅读输入') return <img className="review-feather-icon" src={studyAsset} alt="" aria-hidden="true" />
   return <FeatherIcon className="review-feather-icon" />
 }
 
