@@ -20,7 +20,7 @@ const NAV: Array<{ id: Page; label: string }> = [
 
 const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=3`
 const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=1`
-const studyAsset = `${import.meta.env.BASE_URL}assets/review/book.webp?v=4`
+const studyAsset = `${import.meta.env.BASE_URL}assets/study-book.png?v=1`
 const surfaceAccentAsset = `${import.meta.env.BASE_URL}assets/review/comet.webp?v=3`
 const navAssets: Record<Exclude<Page, 'session'>, string> = {
   home: `${import.meta.env.BASE_URL}assets/nav/home.webp?v=1`,
