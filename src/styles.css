@@ -354,6 +354,7 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .review-orbit-section { padding: 20px 0 12px; }
 .review-orbit-section > h2, .review-rhythm > h2, .review-journal > h2 { margin: 0 0 8px 5px; font-size: 19px; }
 .review-orbit { position: relative; height: 225px; }
+.review-watercolor-trail { position: absolute; z-index: 0; left: -1%; right: -1%; top: 23px; height: 151px; background: url("./assets/watercolor-star-trail.webp") center / 100% 100% no-repeat; opacity: .66; filter: saturate(.76) drop-shadow(0 4px 7px rgba(82,108,151,.08)); pointer-events: none; }
 .review-orbit::before, .review-orbit::after {
   content: "";
   position: absolute;

@@ -668,6 +668,7 @@ function ReviewPage() {
         <section className="review-orbit-section" aria-labelledby="review-stars-heading">
           <h2 id="review-stars-heading">这一周留下的星光</h2>
           <div className="review-orbit" aria-label="本周四项统计">
+            <span className="review-watercolor-trail" aria-hidden="true" />
             <ReviewOrbitMetric className="orbit-one" image="creative.webp" label="创作节点" value={`${summary.nodeCount} / 4`} />
             <ReviewOrbitMetric className="orbit-two" image="clock.webp" label="累计时长" value={formatMinutes(summary.creativeMinutes)} />
             <ReviewOrbitMetric className="orbit-three" image="gym.webp" label="健身记录" value={`${summary.gymCount} 次`} />
