@@ -690,7 +690,7 @@ function ReviewPage() {
         <section className="review-journal" aria-labelledby="review-journal-heading">
           <h2 id="review-journal-heading">把这一周写进星球日记</h2>
           <div className="review-journal-paper">
-            <img src={reviewAsset('book.webp')} alt="" aria-hidden="true" />
+            <img src={reviewAsset('book-clean.png')} alt="" aria-hidden="true" />
             <label><span>✦ 这周我做成了什么</span><textarea value={done} placeholder="写下这一周真正向前推进的部分……" onChange={(event) => { setDone(event.target.value); setSaved(false) }} /></label>
             <label><span>✦ 下周最重要的一个作品增量</span><textarea value={nextWeekGoal} placeholder="不用很多，只写下一件最重要的事……" onChange={(event) => { setNextWeekGoal(event.target.value); setSaved(false) }} /></label>
             <button className="primary-button review-save-button" type="button" onClick={() => void submitReview()}>{saved ? '这一周已收好' : '保存本周复盘'}</button>
