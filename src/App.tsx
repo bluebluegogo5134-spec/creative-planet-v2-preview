@@ -18,7 +18,7 @@ const NAV: Array<{ id: Page; label: string }> = [
   { id: 'review', label: '复盘' }
 ]
 
-const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=3`
+const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=4`
 const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=1`
 const studyAsset = `${import.meta.env.BASE_URL}assets/study-book-clean.png?v=1`
 const surfaceAccentAsset = `${import.meta.env.BASE_URL}assets/review/comet.webp?v=3`
