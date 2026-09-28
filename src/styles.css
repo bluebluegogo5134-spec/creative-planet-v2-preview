@@ -464,8 +464,8 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .nav-review-icon { width: 40px; height: 40px; border-radius: 50%; }
 .nav-item.active .nav-art-icon { transform: translateY(-1px) scale(1.08); filter: saturate(1.04) drop-shadow(0 4px 6px rgba(83,104,153,.18)); }
 .nav-create .nav-icon { width: 48px; height: 48px; margin-top: -24px; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #e7a157, #d87860); box-shadow: 0 8px 19px rgba(180, 105, 71, .24); font-size: 25px; }
-.nav-create .nav-icon:has(.nav-feather-icon) { background: transparent; box-shadow: 0 7px 16px rgba(88,116,157,.2); }
-.feather-pen-icon { display: block; object-fit: contain; }
+.nav-create .nav-icon:has(.nav-feather-icon) { background: transparent; box-shadow: none; }
+.feather-pen-icon { display: block; object-fit: contain; filter: none !important; box-shadow: none !important; }
 .category-icon { display: block; object-fit: contain; }
 .nav-feather-icon { width: 52px; height: 52px; max-width: none; }
 .nav-timer-active .nav-icon::after { content: ""; position: absolute; right: -1px; top: -3px; width: 10px; height: 10px; border: 2px solid #fffdf8; border-radius: 50%; background: #dc745d; box-shadow: 0 2px 5px rgba(129,73,66,.25); }
