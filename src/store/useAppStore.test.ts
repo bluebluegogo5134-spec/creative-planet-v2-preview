@@ -16,6 +16,7 @@ describe('session record workflow', () => {
       sessions: [],
       weekPlan: [],
       weekReview: null,
+      periodReviews: {},
       currentProjectId: '',
       activeTimer: { status: 'idle' }
     })

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { addDaysKey, getWeekStart, toDateKey } from './domain/date'
+import { addDaysKey, getWeekStart, getWeekStartFromDateKey, toDateKey } from './domain/date'
 import { CREATIVE_TYPES, type CreativeSession, type DayPeriod, type Project, type WeekPlanItem } from './domain/model'
 import { getElapsedMs } from './domain/timer'
 import { summarizeWeek, WEEKLY_MINUTE_GOAL, WEEKLY_NODE_GOAL } from './domain/weekly'
+import { automaticReviewKind, getReviewPeriod, longestPassingWeekStreak, passingWeekStreak, sessionsInPeriod, summarizePeriod, type ReviewPeriodKind } from './domain/review'
 import { weekDateKey } from './data/defaults'
 import { createBackup, restoreBackup } from './data/backup'
 import { useAppStore } from './store/useAppStore'
@@ -18,8 +19,8 @@ const NAV: Array<{ id: Page; label: string }> = [
   { id: 'review', label: '复盘' }
 ]
 
-const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=4`
-const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=1`
+const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=5`
+const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=2`
 const studyAsset = `${import.meta.env.BASE_URL}assets/study-book-clean.png?v=1`
 const surfaceAccentAsset = `${import.meta.env.BASE_URL}assets/review/comet.webp?v=3`
 const navAssets: Record<Exclude<Page, 'session'>, string> = {
@@ -618,91 +619,81 @@ function PlanPage() {
   )
 }
 
+const REVIEW_PERIOD_COPY: Record<ReviewPeriodKind, { short: string; name: string; heroTitle: string; subtitle: string; starsHeading: string; rhythmHeading: string; journalHeading: string; donePrompt: string; nextPrompt: string }> = {
+  week: { short: '周', name: '本周', heroTitle: '本 周 复 盘', subtitle: '回头看见走过的星光', starsHeading: '这一周留下的星光', rhythmHeading: '这一周的创作节律', journalHeading: '把这一周写进星球日记', donePrompt: '这周我做成了什么', nextPrompt: '下周最重要的一个作品增量' },
+  month: { short: '月', name: '本月', heroTitle: '本 月 复 盘', subtitle: '把散落的日子连成星座', starsHeading: '这个月汇聚的星光', rhythmHeading: '这个月的创作节律', journalHeading: '把这个月写进星球日记', donePrompt: '这个月我完成了什么', nextPrompt: '下个月最重要的作品增量' },
+  quarter: { short: '季', name: '本季度', heroTitle: '季 度 复 盘', subtitle: '看见作品生长的方向', starsHeading: '这个季度汇聚的星光', rhythmHeading: '这个季度的创作节律', journalHeading: '把这个季度写进星球日记', donePrompt: '这个季度我完成了什么', nextPrompt: '下个季度最重要的作品增量' },
+  half: { short: '半年', name: '这半年', heroTitle: '半 年 复 盘', subtitle: '在更长的时间里看见自己', starsHeading: '这半年汇聚的星光', rhythmHeading: '这半年的创作节律', journalHeading: '把这半年写进星球日记', donePrompt: '这半年我完成了什么', nextPrompt: '下半年最重要的作品增量' },
+  year: { short: '年', name: '今年', heroTitle: '年 度 复 盘', subtitle: '为这一年的坚持命名', starsHeading: '这一年汇聚的星光', rhythmHeading: '这一年的创作节律', journalHeading: '把这一年写进星球日记', donePrompt: '这一年我完成了什么', nextPrompt: '明年最重要的作品增量' }
+}
+
 function ReviewPage() {
   const projects = useAppStore((state) => state.projects)
   const sessions = useAppStore((state) => state.sessions)
   const weekPlan = useAppStore((state) => state.weekPlan)
   const review = useAppStore((state) => state.weekReview)
+  const periodReviews = useAppStore((state) => state.periodReviews)
   const saveReview = useAppStore((state) => state.saveReview)
-  const [done, setDone] = useState(review?.done ?? '')
-  const [nextWeekGoal, setNextWeekGoal] = useState(review?.nextWeekGoal ?? '')
+  const savePeriodReview = useAppStore((state) => state.savePeriodReview)
+  const today = toDateKey(Date.now())
+  const [periodKind, setPeriodKind] = useState<ReviewPeriodKind>(() => automaticReviewKind(today))
+  const period = getReviewPeriod(periodKind, today)
+  const storedPeriodReview = periodKind === 'week' ? null : periodReviews[period.key]
+  const [done, setDone] = useState(periodKind === 'week' ? review?.done ?? '' : storedPeriodReview?.done ?? '')
+  const [nextWeekGoal, setNextWeekGoal] = useState(periodKind === 'week' ? review?.nextWeekGoal ?? '' : storedPeriodReview?.nextGoal ?? '')
   const [saved, setSaved] = useState(false)
   const weekStart = getWeekStart(Date.now())
-  const summary = summarizeWeek(sessions, weekStart)
-  const inWeek = sessions.filter((session) => session.weekStart === weekStart && session.type !== '健身')
-  const byType = groupMinutes(inWeek, (session) => session.type)
-  const byProject = groupMinutes(inWeek, (session) => projects.find((project) => project.id === session.projectId)?.name ?? '未归属项目')
+  const weeklySummary = summarizeWeek(sessions, weekStart)
+  const periodSummary = summarizePeriod(sessions, period)
+  const creativeInPeriod = sessionsInPeriod(sessions, period).filter((session) => session.type !== '健身')
+  const byType = groupMinutes(creativeInPeriod, (session) => session.type)
+  const byProject = groupMinutes(creativeInPeriod, (session) => projects.find((project) => project.id === session.projectId)?.name ?? '未归属项目')
   const streak = passingWeekStreak(sessions, weekStart)
-  const easiestSlot = mostProductiveSlot(inWeek)
-  const missedSlot = firstMissedCreativeSlot(weekPlan, summary.nodeDateKeys)
+  const easiestSlot = mostProductiveSlot(creativeInPeriod)
+  const missedSlot = firstMissedCreativeSlot(weekPlan, weeklySummary.nodeDateKeys)
+  const cumulative = summarizePeriod(sessions, { kind: 'year', start: '0000-01-01', end: '9999-12-31', key: 'all' })
+  const copy = REVIEW_PERIOD_COPY[periodKind]
+  const isWeekly = periodKind === 'week'
 
   useEffect(() => {
-    setDone(review?.done ?? '')
-    setNextWeekGoal(review?.nextWeekGoal ?? '')
+    setDone(periodKind === 'week' ? review?.done ?? '' : storedPeriodReview?.done ?? '')
+    setNextWeekGoal(periodKind === 'week' ? review?.nextWeekGoal ?? '' : storedPeriodReview?.nextGoal ?? '')
     setSaved(false)
-  }, [review])
+  }, [periodKind, period.key, review, storedPeriodReview])
 
   async function submitReview() {
-    await saveReview(done, nextWeekGoal)
+    if (periodKind === 'week') await saveReview(done, nextWeekGoal)
+    else await savePeriodReview({ key: period.key, kind: periodKind, periodStart: period.start, periodEnd: period.end, done, nextGoal: nextWeekGoal })
     setSaved(true)
   }
 
-  return (
-    <>
-      <header className="review-hero-v2" style={{ backgroundImage: `url("${reviewAsset('review-hero-v2.webp')}")` }}>
-        <div className="review-hero-copy">
-          <h1 className="review-hero-title">本 周 复 盘</h1>
-          <p className="review-hero-subtitle">回头看见走过的星光</p>
-          <span className="review-hero-divider" aria-hidden="true">✦</span>
-          <blockquote>“你为热爱的事，<br />悄悄坚持着，<br />世界会记得。”</blockquote>
-        </div>
-      </header>
-
-      <section className="review-page-stack">
-        <section className={`review-achievement ${summary.passed ? 'passed' : ''}`}>
-          <img src={reviewAsset('star.webp')} alt="" aria-hidden="true" />
-          <div><h2>{summary.passed ? '本周已达标' : '本周仍在生长'}</h2><p>4 个创作节点 ＋ 累计 14 小时</p></div>
-          <strong>{streak > 0 ? `连续第 ${streak} 周` : '继续靠近'}</strong>
-        </section>
-
-        <section className="review-orbit-section" aria-labelledby="review-stars-heading">
-          <h2 id="review-stars-heading">这一周留下的星光</h2>
-          <div className="review-orbit" aria-label="本周四项统计">
-            <span className="review-watercolor-trail" aria-hidden="true" />
-            <ReviewOrbitMetric className="orbit-one" image="creative.webp" label="创作节点" value={`${summary.nodeCount} / 4`} />
-            <ReviewOrbitMetric className="orbit-two" image="clock.webp" label="累计时长" value={formatMinutes(summary.creativeMinutes)} />
-            <ReviewOrbitMetric className="orbit-three" image="gym.webp" label="健身记录" value={`${summary.gymCount} 次`} />
-            <ReviewOrbitMetric className="orbit-four" image="star.webp" label="连续达标" value={`${streak} 周`} />
-          </div>
-        </section>
-
-        <ReviewTimeBreakdown items={byType} />
-        <ReviewProjectBreakdown items={byProject} />
-
-        <section className="review-rhythm" aria-labelledby="review-rhythm-heading">
-          <h2 id="review-rhythm-heading">这一周的创作节律</h2>
-          <div className="review-rhythm-grid">
-            <article><span>✦ 最容易进入状态</span><strong>{easiestSlot}</strong><img src={reviewAsset('comet.webp')} alt="" aria-hidden="true" /></article>
-            <article><span>✦ 最容易失约</span><strong>{missedSlot}</strong><img className="review-missed-icon" src={reviewAsset('moon-cloud.png')} alt="" aria-hidden="true" /></article>
-          </div>
-        </section>
-
-        <section className="review-journal" aria-labelledby="review-journal-heading">
-          <h2 id="review-journal-heading">把这一周写进星球日记</h2>
-          <div className="review-journal-paper">
-            <img src={reviewAsset('book-clean.png')} alt="" aria-hidden="true" />
-            <label><span>✦ 这周我做成了什么</span><textarea value={done} placeholder="写下这一周真正向前推进的部分……" onChange={(event) => { setDone(event.target.value); setSaved(false) }} /></label>
-            <label><span>✦ 下周最重要的一个作品增量</span><textarea value={nextWeekGoal} placeholder="不用很多，只写下一件最重要的事……" onChange={(event) => { setNextWeekGoal(event.target.value); setSaved(false) }} /></label>
-            <button className="primary-button review-save-button" type="button" onClick={() => void submitReview()}>{saved ? '这一周已收好' : '保存本周复盘'}</button>
-          </div>
-        </section>
-
-        <section className="review-data-section" aria-label="数据安全与备份">
-          <DataSafetyCard />
-        </section>
+  return <>
+    <header className="review-hero-v2" style={{ backgroundImage: `url("${reviewAsset('review-hero-v2.webp')}")` }}>
+      <div className="review-hero-copy"><h1 className="review-hero-title">{copy.heroTitle}</h1><p className="review-hero-subtitle">{copy.subtitle}</p><span className="review-hero-divider" aria-hidden="true">✦</span><blockquote>“你为热爱的事，<br />悄悄坚持着，<br />世界会记得。”</blockquote></div>
+    </header>
+    <section className="review-page-stack">
+      <nav className="review-period-tabs" aria-label="选择复盘周期">{(Object.keys(REVIEW_PERIOD_COPY) as ReviewPeriodKind[]).map((kind) => <button type="button" className={periodKind === kind ? 'active' : ''} key={kind} onClick={() => setPeriodKind(kind)}>{REVIEW_PERIOD_COPY[kind].short}</button>)}</nav>
+      <section className={`review-achievement ${isWeekly && weeklySummary.passed ? 'passed' : ''}`}>
+        <img src={reviewAsset('star.webp')} alt="" aria-hidden="true" />
+        <div><h2>{isWeekly ? (weeklySummary.passed ? '本周已达标' : '本周仍在生长') : `${copy.name}留下了 ${periodSummary.nodeCount} 个节点`}</h2><p>{isWeekly ? '4 个创作节点 ＋ 累计 14 小时' : `${period.start.replaceAll('-', '.')} — ${period.end.replaceAll('-', '.')}`}</p></div>
+        <strong>{streak > 0 ? `连续第 ${streak} 周` : '继续靠近'}</strong>
       </section>
-    </>
-  )
+      <section className="review-orbit-section" aria-labelledby="review-stars-heading">
+        <h2 id="review-stars-heading">{copy.starsHeading}</h2>
+        <div className="review-orbit" aria-label={`${copy.name}四项统计`}><span className="review-watercolor-trail" aria-hidden="true" /><ReviewOrbitMetric className="orbit-one" image="creative.webp" label="创作节点" value={isWeekly ? `${periodSummary.nodeCount} / 4` : `${periodSummary.nodeCount} 个`} /><ReviewOrbitMetric className="orbit-two" image="clock.webp" label="累计时长" value={formatMinutes(periodSummary.creativeMinutes)} /><ReviewOrbitMetric className="orbit-three" image="gym.webp" label="健身记录" value={`${periodSummary.gymCount} 次`} /><ReviewOrbitMetric className="orbit-four" image="star.webp" label="连续达标" value={`${streak} 周`} /></div>
+      </section>
+      <CumulativeReview summary={cumulative} achievedWeeks={countPassingWeeks(sessions)} longestStreak={longestPassingWeekStreak(sessions)} />
+      <ReviewTimeBreakdown items={byType} />
+      <ReviewProjectBreakdown items={byProject} />
+      <section className="review-rhythm" aria-labelledby="review-rhythm-heading"><h2 id="review-rhythm-heading">{copy.rhythmHeading}</h2><div className="review-rhythm-grid"><article><span>✦ 最容易进入状态</span><strong>{easiestSlot}</strong><img src={reviewAsset('comet.webp')} alt="" aria-hidden="true" /></article><article><span>✦ 最容易失约</span><strong>{missedSlot}</strong><img className="review-missed-icon" src={reviewAsset('moon-cloud.png')} alt="" aria-hidden="true" /></article></div></section>
+      <section className="review-journal" aria-labelledby="review-journal-heading"><h2 id="review-journal-heading">{copy.journalHeading}</h2><div className="review-journal-paper"><img src={reviewAsset('book-clean.png')} alt="" aria-hidden="true" /><label><span>✦ {copy.donePrompt}</span><textarea value={done} placeholder={`写下${copy.name}真正向前推进的部分……`} onChange={(event) => { setDone(event.target.value); setSaved(false) }} /></label><label><span>✦ {copy.nextPrompt}</span><textarea value={nextWeekGoal} placeholder="不用很多，只写下一件最重要的事……" onChange={(event) => { setNextWeekGoal(event.target.value); setSaved(false) }} /></label><button className="primary-button review-save-button" type="button" onClick={() => void submitReview()}>{saved ? `${copy.name}已收好` : `保存${copy.name}复盘`}</button></div></section>
+      <section className="review-data-section" aria-label="数据安全与备份"><DataSafetyCard /></section>
+    </section>
+  </>
+}
+
+function CumulativeReview({ summary, achievedWeeks, longestStreak }: { summary: ReturnType<typeof summarizePeriod>; achievedWeeks: number; longestStreak: number }) {
+  return <section className="review-cumulative" aria-labelledby="review-cumulative-heading"><div className="review-section-title"><h2 id="review-cumulative-heading">一路走来的星光</h2><span>累计至今</span></div><div className="review-cumulative-grid"><article><b>{summary.nodeCount}</b><span>创作节点</span></article><article><b>{formatMinutes(summary.creativeMinutes)}</b><span>专注时长</span></article><article><b>{summary.connectionCount}</b><span>建立连接</span></article><article><b>{summary.gymCount}</b><span>健身记录</span></article><article><b>{achievedWeeks}</b><span>达标周数</span></article><article><b>{longestStreak}</b><span>最长连续</span></article></div></section>
 }
 
 function groupMinutes(sessions: CreativeSession[], key: (session: CreativeSession) => string): Array<[string, number]> {
@@ -715,7 +706,7 @@ function ReviewOrbitMetric({ className, image, label, value }: { className: stri
   return <div className={`review-orbit-metric ${className}`}><img src={reviewAsset(image)} alt="" aria-hidden="true" /><span>{label}</span><strong>{value}</strong></div>
 }
 
-const REVIEW_COLORS = ['#8d84d8', '#5c9fe1', '#69a8b5', '#71ae8e', '#e7b24c']
+const REVIEW_COLORS = ['#8d84d8', '#5c9fe1', '#69a8b5', '#71ae8e', '#e7b24c', '#d98f78', '#708fc3', '#b58abf']
 
 function ReviewActivityIcon({ label }: { label: string }) {
   if (label === '健身') return <CategoryIcon type="健身" className="review-feather-icon" />
@@ -726,8 +717,8 @@ function ReviewActivityIcon({ label }: { label: string }) {
 }
 
 function ReviewTimeBreakdown({ items }: { items: Array<[string, number]> }) {
-  const visible = items.slice(0, 5)
-  const total = visible.reduce((sum, [, minutes]) => sum + minutes, 0)
+  const visible = items.slice(0, 8)
+  const total = items.reduce((sum, [, minutes]) => sum + minutes, 0)
   return (
     <section className="review-time-section" aria-labelledby="review-time-heading">
       <div className="review-section-title"><h2 id="review-time-heading">时间去了哪里</h2><span>{formatMinutes(total)}</span></div>
@@ -766,14 +757,9 @@ function ReviewProjectBreakdown({ items }: { items: Array<[string, number]> }) {
   )
 }
 
-function passingWeekStreak(sessions: CreativeSession[], currentWeek: string): number {
-  let streak = 0
-  let week = currentWeek
-  while (summarizeWeek(sessions, week).passed) {
-    streak += 1
-    week = addDaysKey(week, -7)
-  }
-  return streak
+function countPassingWeeks(sessions: CreativeSession[]): number {
+  return [...new Set(sessions.map((session) => getWeekStartFromDateKey(session.dateKey)))]
+    .filter((week) => summarizeWeek(sessions, week).passed).length
 }
 
 function mostProductiveSlot(sessions: CreativeSession[]): string {

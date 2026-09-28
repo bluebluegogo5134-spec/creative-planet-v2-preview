@@ -81,6 +81,17 @@ export interface WeekReview {
   updatedAt: number
 }
 
+export interface PeriodReview {
+  key: string
+  kind: 'month' | 'quarter' | 'half' | 'year'
+  periodStart: string
+  periodEnd: string
+  done: string
+  nextGoal: string
+  createdAt: number
+  updatedAt: number
+}
+
 export interface AppStateRecord {
   key: string
   value: unknown

@@ -3,6 +3,7 @@ import { getWeekStart, getWeekStartFromDateKey, toDateKey } from '../domain/date
 import type {
   CreativeSession,
   CreativeType,
+  PeriodReview,
   Project,
   TimerState,
   WeekPlanItem,
@@ -49,6 +50,7 @@ interface AppStore {
   sessions: CreativeSession[]
   weekPlan: WeekPlanItem[]
   weekReview: WeekReview | null
+  periodReviews: Record<string, PeriodReview>
   currentProjectId: string
   activeTimer: TimerState
   init: () => Promise<void>
@@ -66,6 +68,7 @@ interface AppStore {
   deleteSession: (id: string) => Promise<void>
   saveWeekPlan: (items: WeekPlanItem[]) => Promise<void>
   saveReview: (done: string, nextWeekGoal: string) => Promise<void>
+  savePeriodReview: (review: Omit<PeriodReview, 'createdAt' | 'updatedAt'>) => Promise<void>
 }
 
 function newId(prefix: string): string {
@@ -89,12 +92,13 @@ export const useAppStore = create<AppStore>((set, get) => {
     const now = Date.now()
     const weekStart = getWeekStart(now)
     await ensureWeekPlan(weekStart, now)
-    const [projects, sessions, weekPlan, weekReview, currentProjectId, activeTimer] =
+    const [projects, sessions, weekPlan, weekReview, periodReviews, currentProjectId, activeTimer] =
       await Promise.all([
         db.projects.orderBy('updatedAt').reverse().toArray(),
         db.sessions.orderBy('endedAt').reverse().toArray(),
         db.weekPlans.where('weekStart').equals(weekStart).sortBy('dayIndex'),
         db.weekReviews.get(weekStart),
+        appState<Record<string, PeriodReview>>('periodReviews', {}),
         appState('currentProjectId', ''),
         appState<TimerState>('activeTimer', { status: 'idle' })
       ])
@@ -108,6 +112,7 @@ export const useAppStore = create<AppStore>((set, get) => {
       sessions,
       weekPlan,
       weekReview: weekReview ?? null,
+      periodReviews,
       currentProjectId: safeCurrent,
       activeTimer,
       ready: true,
@@ -135,6 +140,7 @@ export const useAppStore = create<AppStore>((set, get) => {
     sessions: [],
     weekPlan: [],
     weekReview: null,
+    periodReviews: {},
     currentProjectId: '',
     activeTimer: { status: 'idle' },
 
@@ -348,6 +354,21 @@ export const useAppStore = create<AppStore>((set, get) => {
           createdAt: existing?.createdAt ?? now,
           updatedAt: now
         })
+      }),
+
+    savePeriodReview: async (review) =>
+      run(async () => {
+        const now = Date.now()
+        const reviews = await appState<Record<string, PeriodReview>>('periodReviews', {})
+        const existing = reviews[review.key]
+        reviews[review.key] = {
+          ...review,
+          done: review.done.trim(),
+          nextGoal: review.nextGoal.trim(),
+          createdAt: existing?.createdAt ?? now,
+          updatedAt: now
+        }
+        await saveAppState('periodReviews', reviews)
       })
   }
 })
