@@ -19,7 +19,7 @@ const NAV: Array<{ id: Page; label: string }> = [
   { id: 'review', label: '复盘' }
 ]
 
-const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=5`
+const reviewAsset = (name: string) => `${import.meta.env.BASE_URL}assets/review/${name}?v=6`
 const featherAsset = `${import.meta.env.BASE_URL}assets/feather-pen.webp?v=2`
 const studyAsset = `${import.meta.env.BASE_URL}assets/study-book-clean.png?v=1`
 const surfaceAccentAsset = `${import.meta.env.BASE_URL}assets/review/comet.webp?v=3`
@@ -680,7 +680,7 @@ function ReviewPage() {
       </section>
       <section className="review-orbit-section" aria-labelledby="review-stars-heading">
         <h2 id="review-stars-heading">{copy.starsHeading}</h2>
-        <div className="review-orbit" aria-label={`${copy.name}四项统计`}><span className="review-watercolor-trail" aria-hidden="true" /><ReviewOrbitMetric className="orbit-one" image="creative.webp" label="创作节点" value={isWeekly ? `${periodSummary.nodeCount} / 4` : `${periodSummary.nodeCount} 个`} /><ReviewOrbitMetric className="orbit-two" image="clock.webp" label="累计时长" value={formatMinutes(periodSummary.creativeMinutes)} /><ReviewOrbitMetric className="orbit-three" image="gym.webp" label="健身记录" value={`${periodSummary.gymCount} 次`} /><ReviewOrbitMetric className="orbit-four" image="star.webp" label="连续达标" value={`${streak} 周`} /></div>
+        <div className="review-orbit" aria-label={`${copy.name}四项统计`}><span className="review-watercolor-trail" aria-hidden="true" /><ReviewOrbitMetric className="orbit-one" image="creative-node.png" label="创作节点" value={isWeekly ? `${periodSummary.nodeCount} / 4` : `${periodSummary.nodeCount} 个`} /><ReviewOrbitMetric className="orbit-two" image="clock.webp" label="累计时长" value={formatMinutes(periodSummary.creativeMinutes)} /><ReviewOrbitMetric className="orbit-three" image="gym.webp" label="健身记录" value={`${periodSummary.gymCount} 次`} /><ReviewOrbitMetric className="orbit-four" image="star.webp" label="连续达标" value={`${streak} 周`} /></div>
       </section>
       <CumulativeReview summary={cumulative} achievedWeeks={countPassingWeeks(sessions)} longestStreak={longestPassingWeekStreak(sessions)} />
       <ReviewTimeBreakdown items={byType} />
