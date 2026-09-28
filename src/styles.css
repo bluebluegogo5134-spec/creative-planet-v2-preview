@@ -370,6 +370,7 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 }
 .review-achievement img { width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 5px 8px rgba(74,102,137,.12)); }
 .review-achievement h2 { margin: 0; font-size: 23px; }
+.review-achievement.period-summary h2 { font-size: 18px; line-height: 1.25; letter-spacing: -.02em; white-space: nowrap; }
 .review-achievement p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
 .review-achievement > strong { color: #31537a; font-family: STKaiti, KaiTi, serif; font-size: 16px; white-space: nowrap; }
 
@@ -520,6 +521,7 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
   .review-achievement { grid-template-columns: 52px minmax(0,1fr) auto; padding-inline: 18px; }
   .review-achievement img { width: 52px; height: 52px; }
   .review-achievement h2 { font-size: 21px; }
+  .review-achievement.period-summary h2 { font-size: 17px; }
   .review-achievement > strong { font-size: 15px; }
   .review-orbit-metric { width: 76px; }
   .review-orbit-metric img { width: 54px; height: 54px; }

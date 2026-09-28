@@ -673,7 +673,7 @@ function ReviewPage() {
     </header>
     <section className="review-page-stack">
       <nav className="review-period-tabs" aria-label="选择复盘周期">{(Object.keys(REVIEW_PERIOD_COPY) as ReviewPeriodKind[]).map((kind) => <button type="button" className={periodKind === kind ? 'active' : ''} key={kind} onClick={() => setPeriodKind(kind)}>{REVIEW_PERIOD_COPY[kind].short}</button>)}</nav>
-      <section className={`review-achievement ${isWeekly && weeklySummary.passed ? 'passed' : ''}`}>
+      <section className={`review-achievement ${isWeekly && weeklySummary.passed ? 'passed' : ''} ${isWeekly ? '' : 'period-summary'}`}>
         <img src={reviewAsset('star.webp')} alt="" aria-hidden="true" />
         <div><h2>{isWeekly ? (weeklySummary.passed ? '本周已达标' : '本周仍在生长') : `${copy.name}留下了 ${periodSummary.nodeCount} 个节点`}</h2><p>{isWeekly ? '4 个创作节点 ＋ 累计 14 小时' : `${period.start.replaceAll('-', '.')} — ${period.end.replaceAll('-', '.')}`}</p></div>
         <strong>{streak > 0 ? `连续第 ${streak} 周` : '继续靠近'}</strong>
