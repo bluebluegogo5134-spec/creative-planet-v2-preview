@@ -693,7 +693,18 @@ function ReviewPage() {
 }
 
 function CumulativeReview({ summary, achievedWeeks, longestStreak }: { summary: ReturnType<typeof summarizePeriod>; achievedWeeks: number; longestStreak: number }) {
-  return <section className="review-cumulative" aria-labelledby="review-cumulative-heading"><div className="review-section-title"><h2 id="review-cumulative-heading">一路走来的星光</h2><span>累计至今</span></div><div className="review-cumulative-grid"><article><b>{summary.nodeCount}</b><span>创作节点</span></article><article><b>{formatMinutes(summary.creativeMinutes)}</b><span>专注时长</span></article><article><b>{summary.connectionCount}</b><span>建立连接</span></article><article><b>{summary.gymCount}</b><span>健身记录</span></article><article><b>{achievedWeeks}</b><span>达标周数</span></article><article><b>{longestStreak}</b><span>最长连续</span></article></div></section>
+  const stars = [
+    { label: '创作节点', value: summary.nodeCount, image: 'creative-node.png' },
+    { label: '专注时长', value: formatMinutes(summary.creativeMinutes), image: 'clock.webp' },
+    { label: '建立连接', value: summary.connectionCount, image: 'comet.webp' },
+    { label: '健身记录', value: summary.gymCount, image: 'gym.webp' },
+    { label: '达标周数', value: achievedWeeks, image: 'star.webp' },
+    { label: '最长连续', value: `${longestStreak} 周`, image: 'star.webp' }
+  ]
+  return <section className="review-cumulative" aria-labelledby="review-cumulative-heading">
+    <div className="review-section-title"><h2 id="review-cumulative-heading">一路走来的星光</h2><span>累计至今</span></div>
+    <div className="review-cumulative-map" aria-label="累计创作数据"><span className="cumulative-star-trail" aria-hidden="true" />{stars.map((star, index) => <article className={`cumulative-star cumulative-star-${index + 1}`} key={star.label}><img src={reviewAsset(star.image)} alt="" aria-hidden="true" /><span>{star.label}</span><b>{star.value}</b></article>)}</div>
+  </section>
 }
 
 function groupMinutes(sessions: CreativeSession[], key: (session: CreativeSession) => string): Array<[string, number]> {

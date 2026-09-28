@@ -391,11 +391,23 @@ h1, h2 { font-family: STKaiti, KaiTi, "Songti SC", serif; }
 .orbit-three { right: 27%; top: 39px; }
 .orbit-four { right: 1%; top: 93px; }
 
-.review-cumulative { margin: 2px 3px 8px; padding: 17px 13px 15px; border-radius: 25px; background: radial-gradient(circle at 88% 15%, rgba(246,209,115,.25), transparent 24%), linear-gradient(145deg, rgba(255,253,247,.78), rgba(224,237,248,.62)); box-shadow: 0 8px 20px rgba(73,101,136,.07); }
-.review-cumulative-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; overflow: hidden; border-radius: 18px; background: rgba(151,177,205,.2); }
-.review-cumulative-grid article { min-width: 0; min-height: 70px; display: grid; place-content: center; justify-items: center; gap: 3px; background: rgba(255,253,248,.88); text-align: center; }
-.review-cumulative-grid b { color: #355d87; font-family: STKaiti, KaiTi, serif; font-size: 19px; line-height: 1.1; }
-.review-cumulative-grid span { color: var(--muted); font-size: 10px; }
+.review-cumulative { margin: 0 -2px 5px; padding: 13px 4px 4px; background: radial-gradient(ellipse at 50% 48%, rgba(237,245,251,.52), transparent 72%); }
+.review-cumulative .review-section-title { padding: 0 12px; }
+.review-cumulative-map { position: relative; height: 220px; overflow: hidden; }
+.cumulative-star-trail { position: absolute; z-index: 0; inset: 2px -12px 5px; opacity: .5; background: url("./assets/watercolor-star-trail.webp") center / 112% 100% no-repeat; transform: scaleY(-1) rotate(-2deg); filter: saturate(.72); }
+.review-cumulative-map::before, .review-cumulative-map::after { content: ""; position: absolute; z-index: 0; left: 4%; right: 2%; height: 83px; border-radius: 50%; pointer-events: none; }
+.review-cumulative-map::before { top: 18px; border-top: 1.5px solid rgba(91,158,224,.42); transform: rotate(2deg); }
+.review-cumulative-map::after { top: 101px; border-bottom: 1px solid rgba(190,146,211,.45); transform: rotate(-2deg); }
+.cumulative-star { position: absolute; z-index: 1; width: 88px; display: grid; grid-template-columns: 30px minmax(0,1fr); grid-template-rows: auto auto; align-items: center; column-gap: 4px; text-align: left; }
+.cumulative-star img { grid-row: 1 / 3; width: 30px; height: 30px; object-fit: contain; filter: none; }
+.cumulative-star span { align-self: end; color: #718399; font-size: 10px; line-height: 1.1; white-space: nowrap; }
+.cumulative-star b { align-self: start; color: #31577e; font-family: STKaiti, KaiTi, serif; font-size: 17px; line-height: 1.15; white-space: nowrap; }
+.cumulative-star-1 { left: 2%; top: 30px; }
+.cumulative-star-2 { left: 35%; top: 13px; }
+.cumulative-star-3 { right: 0; top: 46px; }
+.cumulative-star-4 { left: 7%; top: 143px; }
+.cumulative-star-5 { left: 39%; top: 117px; }
+.cumulative-star-6 { right: -1%; top: 145px; }
 
 .review-time-section, .review-project-section {
   position: relative;
